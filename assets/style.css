@@ -1,0 +1,76 @@
+/* === Global Styles: Black & Orange Modern Theme === */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212; /* dark background */
+    color: #fff;
+}
+
+header {
+    background-color: rgba(31,31,31,0.9);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    color: #ff6f00;
+}
+
+nav a {
+    color: #fff;
+    margin: 0 15px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #ff9100;
+}
+
+button, .btn {
+    background-color: #ff6f00;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+button:hover, .btn:hover {
+    background-color: #ff9100;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0 15px 0;
+    border: 1px solid #333;
+    border-radius: 5px;
+    background-color: #1f1f1f;
+    color: #fff;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #ff6f00;
+}
+
+.card {
+    background-color: rgba(31,31,31,0.9);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #1f1f1f;
+    color: #aaa;
+    margin-top: 30px;
+}
