@@ -17,10 +17,10 @@ require_once '../includes/db_connect.php';
         <div class="nav-container">
             <h1 class="nav-logo">MealMate</h1>
             <ul class="nav-menu">
-                <li><a href="../index.php">Home</a></li>
-                <li><a href="../login.php">Login</a></li>
-                <li><a href="menu.php" class="active">Menu</a></li>
-                <li><a href="../cart.php">Cart</a></li>
+                <li><a href="../index.php">HOME</a></li>
+                <li><a href="../login.php">LOGIN</a></li>
+                <li><a href="menu.php" class="active">MENU</a></li>
+                <li><a href="../cart.php">CART</a></li>
             </ul>
         </div>
     </nav>

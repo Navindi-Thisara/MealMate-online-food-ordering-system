@@ -11,78 +11,116 @@ body {
     line-height: 1.6;
 }
 
+/* === Navbar Styles === */
 .navbar {
-    background-color: #1a1a1a;
-    padding: 1rem 0;
-    border-bottom: 2px solid #ff4500;
+    background-color: rgba(0, 0, 0, 0.95);
+    padding: 12px 40px;
+    border-bottom: 2px solid #FF4500;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    position: relative;
 }
 
 .nav-container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1400px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 2rem;
 }
 
 .nav-logo {
-    color: #ff4500;
-    font-size: 1.8rem;
+    color: #FF4500;
+    font-size: 28px;
     font-weight: bold;
+    margin: 0;
 }
 
 .nav-menu {
     display: flex;
     list-style: none;
     gap: 2rem;
+    align-items: center;
 }
 
 .nav-menu a {
-    color: #ffffff;
+    color: #fff;
     text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
     padding: 0.5rem 1rem;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.nav-menu a:hover,
+.nav-menu a:hover {
+    background-color: rgba(255, 69, 0, 0.2);
+}
+
 .nav-menu a.active {
-    background-color: #ff4500;
-    color: #000000;
+    background-color: #FF4500;
+    color: #000;
+    font-weight: bold;
 }
 
+/* === Main Content Container === */
 .container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 2rem;
+    width: 100%;
+    max-width: 1400px;
+    margin: 1rem auto 2rem auto;
+    padding: 0 1.5rem;
 }
 
+/* === Header Section - FIXED === */
 .header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem 0;
+    position: relative;
 }
 
 .header h2 {
     color: #ff4500;
-    font-size: 2.5rem;
+    font-size: 2rem;
+    font-weight: bold;
     margin-bottom: 0.5rem;
 }
 
 .header p {
     color: #cccccc;
     font-size: 1.1rem;
+    margin-bottom: 1rem;
 }
 
+/* Orange line extends fully across screen */
+.header::after {
+    content: "";
+    position: absolute;
+    bottom: -10px; /* adjust spacing below text */
+    left: 0;
+    right: 0;
+    width: 100vw;
+    height: 2px;
+    background-color: #ff4500;
+    margin-left: calc(-50vw + 50%);
+}
+
+/* === Menu Grid === */
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
+    padding: 0;
+    margin-top: 1rem;
 }
 
 .menu-item {
     background-color: #1a1a1a;
-    border-radius: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
     padding: 1.5rem;
     border: 2px solid #333;
     transition: transform 0.3s, border-color 0.3s;
@@ -98,7 +136,7 @@ body {
     height: 200px;
     background-color: #333;
     border-radius: 8px;
-    margin-bottom: 1rem;
+    margin-bottom: 1rem; 
     overflow: hidden;
 }
 
@@ -134,41 +172,77 @@ body {
 
 .add-to-cart {
     background-color: #ff4500;
-    color: #000000;
+    color: #ffffff;
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.7rem 1.5rem;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .add-to-cart:hover {
-    background-color: #ff6347;
+    background-color: #ff6f00;
+    transform: translateY(-2px);
 }
 
-.no-items {
-    text-align: center;
-    color: #cccccc;
-    font-size: 1.2rem;
-    grid-column: 1 / -1;
-}
-
+/* === Responsive Design === */
 @media (max-width: 768px) {
     .nav-container {
-        flex-direction: column;
-        gap: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .container {
+        margin: 0.5rem auto 1.5rem auto;
+        padding: 0 1rem;
+    }
+    
+    .header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .header p {
+        font-size: 1rem;
+    }
+    
+    .menu-grid {
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 10px 1rem;
+    }
+    
+    .nav-logo {
+        font-size: 24px;
     }
     
     .nav-menu {
         gap: 1rem;
     }
     
-    .menu-grid {
-        grid-template-columns: 1fr;
+    .nav-menu a {
+        font-size: 12px;
+        padding: 0.4rem 0.8rem;
     }
     
-    .container {
-        padding: 0 1rem;
+    .header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .header p {
+        font-size: 0.9rem;
+    }
+    
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
