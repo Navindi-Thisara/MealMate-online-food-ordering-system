@@ -1,5 +1,4 @@
 <?php
-// Database connection
 $conn = new mysqli("localhost:3307", "root", "", "online_food_ordering_system");
 
 $msg = "";
@@ -11,7 +10,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $contact_no = trim($_POST['contact_no']);
     $address    = trim($_POST['address']);
 
-    // Check if email already exists
     $check = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $check->bind_param("s", $email);
     $check->execute();
@@ -20,8 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $msg = "⚠️ Email already registered!";
     } else {
-        $stmt = $conn->prepare("INSERT INTO users (full_name, email, password, contact_no, address) 
-                                VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO users (full_name, email, password, contact_no, address) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", $full_name, $email, $password, $contact_no, $address);
 
         if ($stmt->execute()) {
@@ -32,12 +29,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Register - MealMate</title>
-    <link rel="stylesheet" href="../assets/form.css">
+    <link rel="stylesheet" href="../assets/form.css?v=1">
 </head>
 <body>
     <!-- Header -->
@@ -46,8 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <nav>
             <a href="../index.php">Home</a>
             <a href="login.php">Login</a>
-            <a href="#">Menu</a>
-            <a href="#">Cart</a>
+            <a href="../food_management/menu.php">Menu</a>
+            <a href="../cart.php">Cart</a>
         </nav>
     </header>
 

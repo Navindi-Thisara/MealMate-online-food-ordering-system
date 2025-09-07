@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Login - MealMate</title>
-    <link rel="stylesheet" href="../assets/form.css">
+    <link rel="stylesheet" href="../assets/form.css?v=1">
     <?php if ($redirect): ?>
         <meta http-equiv="refresh" content="2;url=../food_management/menu.php">
     <?php endif; ?>
