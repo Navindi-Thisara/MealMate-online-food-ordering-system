@@ -1,5 +1,6 @@
 <?php
-$conn = new mysqli("localhost:3307", "root", "", "online_food_ordering_system");
+session_start();
+include '../includes/db_connect.php';
 
 $msg = "";
 
