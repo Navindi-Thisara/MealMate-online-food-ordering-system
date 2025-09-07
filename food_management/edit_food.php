@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'database.php';
+require_once '../includes/db_connect.php';
 
 // Check if user is admin
 if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $image = $food['image'];
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $image = uniqid() . '_' . $_FILES['image']['name'];
-        move_uploaded_file($_FILES['image']['tmp_name'], '../images/' . $image);
+        move_uploaded_file($_FILES['image']['tmp_name'], '../assets/images/' . $image);
     }
     
     $sql = "UPDATE foods SET name = ?, description = ?, price = ?, category = ?, image = ?, available = ? WHERE id = ?";

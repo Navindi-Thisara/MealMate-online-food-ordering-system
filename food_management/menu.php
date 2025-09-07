@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'database.php';
+require_once '../includes/db_connect.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,13 +43,13 @@ require_once 'database.php';
                         echo '
                 <div class="menu-item">
                     <div class="food-image">
-                        <img src="images/' . $row["image"] . '" alt="' . $row["name"] . '" 
+                        <img src="../assets/images/' . $row["image"] . '" alt="' . $row["name"] . '" 
                              onerror="this.src=\'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzMzIi8+PHRleHQgeD0iNTAlIiB5PSI5MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0ZGNDUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+SW1hZ2UgTm90IEZvdW5kPC90ZXh0Pjwvc3Zn+\'">
                     </div>
                     <h3>' . $row["name"] . '</h3>
                     <p>' . $row["description"] . '</p>
                     <div class="item-footer">
-                        <span class="price">$' . $row["price"] . '</span>
+                        <span class="price">Rs.' . $row["price"] . '</span>
                         <button class="add-to-cart" onclick="addToCart(' . $row["id"] . ')">Add to Cart</button>
                     </div>
                 </div>';
@@ -66,22 +66,22 @@ require_once 'database.php';
             function showStaticMenu()
             {
                 $staticItems = [
-                    ['id' => 1, 'name' => 'Pizza Margherita', 'description' => 'Classic cheese pizza with fresh basil', 'price' => '12.99', 'image' => 'pizza.jpg'],
-                    ['id' => 2, 'name' => 'Burger Deluxe', 'description' => 'Beef patty with cheese and veggies', 'price' => '8.99', 'image' => 'burger.jpg'],
-                    ['id' => 3, 'name' => 'Pasta Alfredo', 'description' => 'Creamy pasta with parmesan cheese', 'price' => '10.99', 'image' => 'pasta.jpg']
+                    ['id' => 1, 'name' => 'Pizza Margherita', 'description' => 'Classic cheese pizza with fresh basil', 'price' => '1200', 'image' => 'pizza.jpg'],
+                    ['id' => 2, 'name' => 'Burger Deluxe', 'description' => 'Beef patty with cheese and veggies', 'price' => '800', 'image' => 'burger.jpg'],
+                    ['id' => 3, 'name' => 'Pasta Alfredo', 'description' => 'Creamy pasta with parmesan cheese', 'price' => '1000', 'image' => 'pasta.jpg']
                 ];
 
                 foreach ($staticItems as $item) {
                     echo '
             <div class="menu-item">
                 <div class="food-image">
-                    <img src="images/' . $item["image"] . '" alt="' . $item["name"] . '" 
+                    <img src="../assets/images/' . $item["image"] . '" alt="' . $item["name"] . '" 
                          onerror="this.src=\'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzMzIi8+PHRleHQgeD0iNTAlIiB5PSI5MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0ZGNDUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+SW1hZ2UgTm90IEZvdW5kPC90ZXh0Pjwvc3Zn+\'">
                 </div>
                 <h3>' . $item["name"] . '</h3>
                 <p>' . $item["description"] . '</p>
                 <div class="item-footer">
-                    <span class="price">$' . $item["price"] . '</span>
+                    <span class="price">Rs.' . $item["price"] . '</span>
                     <button class="add-to-cart" onclick="addToCart(' . $item["id"] . ')">Add to Cart</button>
                 </div>
             </div>';
@@ -97,8 +97,10 @@ require_once 'database.php';
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        // This alert should be replaced with a modal or custom UI in a real app
                         alert('Added to cart successfully!');
                     } else {
+                        // This alert should be replaced with a modal or custom UI in a real app
                         alert('Error: ' + data.message);
                     }
                 });
