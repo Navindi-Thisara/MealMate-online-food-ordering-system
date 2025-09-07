@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a href="../index.php">Home</a>
             <a href="login.php">Login</a>
             <a href="../food_management/menu.php">Menu</a>
-            <a href="../cart.php">Cart</a>
+            <a href="../cart/cart.php">Cart</a>
         </nav>
     </header>
 
