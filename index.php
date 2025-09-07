@@ -17,8 +17,8 @@
     <nav>
         <a href="users/register.php">Register</a>
         <a href="users/login.php">Login</a>
-        <a href="#">Menu</a>
-        <a href="#">Cart</a>
+        <a href="food_management/menu.php">Menu</a>
+        <a href="cart/cart.php">Cart</a>
     </nav>
 </header>
 

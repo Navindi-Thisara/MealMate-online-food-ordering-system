@@ -1,4 +1,4 @@
-/* === Body with background image and dark overlay === */
+/* === MealMate Black & Orange Theme === */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -29,25 +29,27 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.55);
+    background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(26,26,26,0.6) 50%, rgba(255,69,0,0.3) 100%);
     z-index: -1;
 }
 
 header {
-    background-color: rgba(31,31,31,0.85);
+    background-color: #000000;
     padding: 12px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 2;
     position: relative;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 10px rgba(255, 69, 0, 0.3);
+    border-bottom: 2px solid #FF4500;
 }
 
 header h1 {
-    color: #ff6f00;
+    color: #FF4500;
     font-size: 28px;
     font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
 }
 
 nav a {
@@ -56,10 +58,15 @@ nav a {
     text-decoration: none;
     font-size: 16px;
     font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
 }
 
 nav a:hover {
-    color: #ff9100;
+    background: linear-gradient(45deg, #FF4500, #FF6500);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
 }
 
 .intro-text {
@@ -72,7 +79,7 @@ nav a:hover {
 .intro-text h1 {
     font-size: 48px;
     margin-bottom: 15px;
-    color: #ff9100;
+    color: #FF4500;
     text-shadow: 3px 3px 6px #000;
     font-weight: bold;
 }
@@ -110,7 +117,8 @@ nav a:hover {
     top: 0;
     left: 50%;
     transform: translateX(-50%) scale(0.9);
-    background: rgba(31,31,31,0.85);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #FF4500;
     border-radius: 12px;
     text-align: center;
     padding: 15px;
@@ -119,12 +127,14 @@ nav a:hover {
     width: 90%;
     max-width: 350px;
     z-index: 1;
+    box-shadow: 0 0 8px rgba(255, 69, 0, 0.4);
 }
 
 .feature-box.active {
     opacity: 1;
     transform: translateX(-50%) scale(1);
     z-index: 2;
+    box-shadow: 0 0 12px rgba(255, 69, 0, 0.6);
 }
 
 .feature-box img {
@@ -136,7 +146,7 @@ nav a:hover {
 }
 
 .feature-box h2 {
-    color: #ff6f00;
+    color: #FF4500;
     margin-bottom: 8px;
     font-size: 20px;
     font-weight: bold;
@@ -144,21 +154,18 @@ nav a:hover {
 
 .feature-box p {
     font-size: 14px;
-    color: #ddd;
+    color: #fff;
     line-height: 1.4;
-}
-
-.feature-box:hover {
-    transform: translateY(-5px) scale(1.02);
 }
 
 footer {
     text-align: center;
-    padding: 10px;
-    background-color: #1f1f1f;
-    color: #aaa;
+    padding: 20px;
+    background-color: #000000;
+    color: #FF4500;
     font-size: 14px;
     margin-top: auto;
+    border-top: 2px solid #FF4500;
 }
 
 /* === Responsive Design === */
