@@ -222,7 +222,7 @@ window.onload = function(){ showTab('users'); }
 </div>
 
 <footer>
-<p>&copy; <?= date("Y") ?> MealMate Online Food Ordering System</p>
+<p>&copy; <?= date("Y") ?> MealMate. All rights reserved.</p>
 </footer>
 
 </body>
