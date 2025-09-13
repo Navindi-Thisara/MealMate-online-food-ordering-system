@@ -35,6 +35,23 @@ if ($result->num_rows === 1) {
             border: 2px solid #FF4500; /* Orange border */
             box-shadow: 0 4px 12px rgba(255,69,0,0.5);
         }
+        .profile-box p {
+            text-align: left;
+            margin: 8px 0;
+        }
+        .profile-box a.edit-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: #ff6f00;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        .profile-box a.edit-btn:hover {
+            background: #e65c00;
+        }
     </style>
 </head>
 <body>
@@ -57,6 +74,8 @@ if ($result->num_rows === 1) {
     <p><strong>Address:</strong> <?= htmlspecialchars($user['address']) ?></p>
     <p><strong>Role:</strong> <?= htmlspecialchars($user['role']) ?></p>
     <p><strong>Joined On:</strong> <?= htmlspecialchars($user['created_at']) ?></p>
+
+    <a href="edit_user.php" class="edit-btn">Edit Profile</a>
 </div>
 
 <footer>
