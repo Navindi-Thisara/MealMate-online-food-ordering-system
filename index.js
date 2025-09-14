@@ -1,21 +1,31 @@
-// Single card carousel: show one card at a time
+// Sidebar toggle
+const sideNav = document.getElementById('sideNav');
+const menuBtn = document.getElementById('menuBtn');
+const closeBtn = document.getElementById('closeBtn');
+
+menuBtn.addEventListener('click', () => {
+  sideNav.style.width = '250px';
+});
+
+closeBtn.addEventListener('click', () => {
+  sideNav.style.width = '0';
+});
+
+// 3D Carousel
 const boxes = document.querySelectorAll('.feature-box');
 let currentIndex = 0;
 
 function showBox(index) {
     boxes.forEach((box, i) => {
-        if(i === index) {
-            box.classList.add('active');
-        } else {
-            box.classList.remove('active');
-        }
+        box.classList.remove('active');
+        if(i === index) box.classList.add('active');
     });
 }
 
-// Show first card initially
+// Show first card
 showBox(currentIndex);
 
-// Auto rotate every 3 seconds
+// Auto rotate carousel
 setInterval(() => {
     currentIndex++;
     if(currentIndex >= boxes.length) currentIndex = 0;
