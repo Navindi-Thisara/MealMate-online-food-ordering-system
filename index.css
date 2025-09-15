@@ -69,7 +69,7 @@ header .landing-nav a.active::after {
     width: 100%;
 }
 
-.menu-btn { //add close button to menu button
+.menu-btn { 
     font-size: 28px;
     cursor: pointer;
     color: #FF4500;
@@ -214,7 +214,7 @@ header .landing-nav a.active::after {
     line-height: 1.6;
 }
 
-/* Services section */ //should travel cards like a train
+/* Services section */ 
 .services {
     background: #1a1a1a;
 }
