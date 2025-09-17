@@ -1,10 +1,25 @@
+<?php
+session_start();
+
+// If user already logged in
+if (isset($_SESSION['username']) && isset($_SESSION['role'])) {
+    if ($_SESSION['role'] === 'admin') {
+        header("Location: admin_dashboard.php");
+        exit();
+    } elseif ($_SESSION['role'] === 'user') {
+        header("Location: food_management/menu.php");
+        exit();
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>MealMate - Home</title>
     <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="index.js" defer></script>
 </head>
 <body>
@@ -58,17 +73,6 @@
                     <h3>Delicious Meals Delivered</h3>
                     <p>Fresh and tasty meals delivered straight to you!</p>
                 </div>
-                
-                <div class="feature-box">
-                    <img src="assets/images/slide1.png" alt="Easy Ordering">
-                    <h3>Easy Ordering</h3>
-                    <p>Order your favorite meals in just a few clicks!</p>
-                </div>
-                <div class="feature-box">
-                    <img src="assets/images/slide2.jpg" alt="Real-Time Tracking">
-                    <h3>Real-Time Tracking</h3>
-                    <p>Track your order live from kitchen to your door!</p>
-                </div>
             </div>
         </div>
         <div class="carousel-nav">
@@ -106,6 +110,5 @@
     <footer>
         &copy; <?php echo date('Y'); ?> MealMate. All rights reserved.
     </footer>
-
 </body>
 </html>

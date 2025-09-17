@@ -3,7 +3,7 @@ session_start();
 require_once('../includes/db_connect.php'); 
 
 $msg = "";
-$redirect = false;
+$redirectUrl = ""; // store where to redirect
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
@@ -19,14 +19,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows == 1) {
             $user = $result->fetch_assoc();
             if (password_verify($password, $user['password'])) {
-                $msg = "✅ Login successful! Redirecting to menu...";
-                $redirect = true;
-
                 // Start session
-                $_SESSION['user_id'] = $user['user_id'];
+                $_SESSION['user_id']   = $user['user_id'];
                 $_SESSION['full_name'] = $user['full_name'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['role'] = $user['role'];
+                $_SESSION['email']     = $user['email'];
+                $_SESSION['role']      = $user['role'];
+
+                // Choose redirect page by role
+                if ($user['role'] === 'admin') {
+                    $msg = "✅ Login successful! Redirecting to Admin Dashboard...";
+                    $redirectUrl = "../admin/admin_dashboard.php";
+                } else {
+                    $msg = "✅ Login successful! Redirecting to Menu...";
+                    $redirectUrl = "../food_management/menu.php";
+                }
 
                 // Remember Me
                 if ($remember) {
@@ -48,15 +54,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Login - MealMate</title>
     <link rel="stylesheet" href="../assets/form.css?v=1">
-    <?php if ($redirect): ?>
-        <meta http-equiv="refresh" content="2;url=../food_management/menu.php">
+
+    <?php if (!empty($redirectUrl)): ?>
+        <!-- Redirect after 2 seconds -->
+        <meta http-equiv="refresh" content="2;url=<?= $redirectUrl ?>">
     <?php endif; ?>
 </head>
 <body>
