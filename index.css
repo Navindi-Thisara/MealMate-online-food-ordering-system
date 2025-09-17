@@ -12,7 +12,10 @@ body {
     color: #fff;
     scroll-behavior: smooth;
     background-color: #0d0d0d;
+<<<<<<< HEAD
     overflow-x: hidden;
+=======
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
 }
 
 /* Header */
@@ -51,6 +54,98 @@ header .landing-nav a {
 
 header .landing-nav a::after {
     content: '';
+<<<<<<< HEAD
+=======
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #FF4500;
+    transition: width 0.3s ease;
+}
+
+header .landing-nav a:hover,
+header .landing-nav a.active {
+    color: #FF4500;
+}
+
+header .landing-nav a:hover::after,
+header .landing-nav a.active::after {
+    width: 100%;
+}
+
+.menu-btn {
+    font-size: 28px;
+    cursor: pointer;
+    color: #FF4500;
+}
+
+/* Sidebar - new style */
+.side-nav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: rgba(17, 17, 17, 0.95);
+    backdrop-filter: blur(10px);
+    overflow-x: hidden;
+    transition: 0.5s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    padding-top: 80px;
+    z-index: 1500;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    border-left: 2px solid #FF4500;
+}
+
+.side-nav a {
+    display: flex;
+    align-items: center;
+    padding: 15px 30px;
+    font-size: 20px;
+    color: #fff;
+    text-decoration: none;
+    transition: 0.3s ease;
+    border-left: 5px solid transparent;
+}
+
+.side-nav a i {
+    margin-right: 15px;
+    font-size: 22px;
+    color: #FF4500;
+}
+
+.side-nav a:hover {
+    background: #FF4500;
+    color: #000;
+    border-left: 5px solid #fff;
+}
+
+.side-nav a:hover i {
+    color: #000;
+}
+
+/* Sections */
+.section {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #0d0d0d;
+}
+
+.home {
+    position: relative;
+    background: url('assets/images/home-bg.png') center/cover no-repeat;
+}
+
+.home::after {
+    content: "";
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
     position: absolute;
     bottom: -5px;
     left: 0;
@@ -82,6 +177,7 @@ header .landing-nav a.active::after {
     width: 0;
     position: fixed;
     top: 0;
+<<<<<<< HEAD
     right: 0;
     background: rgba(17, 17, 17, 0.95);
     backdrop-filter: blur(10px);
@@ -160,6 +256,12 @@ header .landing-nav a.active::after {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.5);
+=======
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
     z-index: 1;
 }
 
@@ -170,8 +272,19 @@ header .landing-nav a.active::after {
 }
 
 @keyframes fadeIn {
+<<<<<<< HEAD
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
+=======
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
 }
 
 .section h1 {
@@ -184,8 +297,19 @@ header .landing-nav a.active::after {
 }
 
 @keyframes textRise {
+<<<<<<< HEAD
     0% { opacity: 0; transform: translateY(50px); }
     100% { opacity: 1; transform: translateY(0); }
+=======
+    0% {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
 }
 
 .section h2 {
@@ -309,7 +433,11 @@ header .landing-nav a.active::after {
     align-items: center;
     gap: 30px;
     padding: 60px 20px;
+<<<<<<< HEAD
     background: #1a1a1a;
+=======
+    background: #111;
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
 }
 
 .review-list {
@@ -446,6 +574,7 @@ footer {
     header {
         padding: 15px 20px;
     }
+<<<<<<< HEAD
     /* Hide .main-nav by default on smaller screens */
     header .main-nav {
         display: none;
@@ -454,6 +583,11 @@ footer {
     .menu-btn {
         display: block; 
     }
+=======
+    header .landing-nav {
+        display: none;
+    }
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
     .section h1 {
         font-size: 42px;
     }
@@ -467,4 +601,8 @@ footer {
     .review-list {
         grid-template-columns: 1fr;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
