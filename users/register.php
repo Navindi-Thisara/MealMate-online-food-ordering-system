@@ -1,6 +1,6 @@
 <?php
-// Database connection
-$conn = new mysqli("localhost:3307", "root", "", "online_food_ordering_system");
+session_start();
+include '../includes/db_connect.php';
 
 $msg = "";
 
@@ -11,7 +11,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $contact_no = trim($_POST['contact_no']);
     $address    = trim($_POST['address']);
 
-    // Check if email already exists
     $check = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $check->bind_param("s", $email);
     $check->execute();
@@ -20,8 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $msg = "⚠️ Email already registered!";
     } else {
-        $stmt = $conn->prepare("INSERT INTO users (full_name, email, password, contact_no, address) 
-                                VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO users (full_name, email, password, contact_no, address) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", $full_name, $email, $password, $contact_no, $address);
 
         if ($stmt->execute()) {
@@ -32,26 +30,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Register - MealMate</title>
-    <link rel="stylesheet" href="../assets/form.css">
+    <link rel="stylesheet" href="../assets/form.css?v=1">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <h1>MealMate</h1>
         <nav>
             <a href="../index.php">Home</a>
             <a href="login.php">Login</a>
-            <a href="#">Menu</a>
-            <a href="#">Cart</a>
+            <a href="../food_management/menu.php">Menu</a>
+            <a href="../cart/cart.php">Cart</a>
         </nav>
     </header>
 
-    <!-- Registration Form -->
     <div class="form-container">
         <h2>User Registration</h2>
         <?php if ($msg != ""): ?>
@@ -68,11 +65,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
 
         <p class="login-link">
-            Already have an account? <a href="login.php">Login</a>
+            Already have an account? <a href="login.php">Login here</a>
         </p>
     </div>
 
-    <!-- Footer -->
     <footer>
         &copy; <?= date('Y') ?> MealMate. All rights reserved.
     </footer>
