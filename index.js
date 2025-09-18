@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+// Sidebar toggle  
+=======
 // Sidebar toggle  
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
 const sideNav = document.getElementById('sideNav');
 const menuBtn = document.getElementById('menuBtn');
 
@@ -68,3 +72,53 @@ setInterval(() => {
 
 // Initial call to set up the first slide
 updateSlideshow();
+<<<<<<< HEAD
+
+/* --- Header Highlight Fix --- */
+
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('header .landing-nav a');
+
+// Intersection Observer to handle active link on scroll
+const options = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.5 // Adjust this value for when the highlight should change
+};
+
+const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const currentId = entry.target.id;
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === currentId) {
+                    link.classList.add('active');
+                }
+            });
+        }
+    });
+}, options);
+
+sections.forEach(section => {
+    observer.observe(section);
+});
+
+// Add a click event listener for smooth scrolling and immediate highlighting
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+            window.scrollTo({
+                top: targetSection.offsetTop - 80, // Adjust for the fixed header height
+                behavior: 'smooth'
+            });
+            navLinks.forEach(navLink => navLink.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+});
+=======
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
