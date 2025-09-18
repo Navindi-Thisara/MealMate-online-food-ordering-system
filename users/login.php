@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Choose redirect page by role
                 if ($user['role'] === 'admin') {
                     $msg = "✅ Login successful! Redirecting to Admin Dashboard...";
-                    $redirectUrl = "../admin/admin_dashboard.php";
+                    $redirectUrl = "../users/dashboard.php";
                 } else {
                     $msg = "✅ Login successful! Redirecting to Menu...";
                     $redirectUrl = "../food_management/menu.php";
