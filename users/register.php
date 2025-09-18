@@ -39,7 +39,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="../assets/form.css?v=1">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <h1>MealMate</h1>
         <nav>
@@ -50,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </nav>
     </header>
 
-    <!-- Registration Form -->
     <div class="form-container">
         <h2>User Registration</h2>
         <?php if ($msg != ""): ?>
@@ -67,11 +65,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
 
         <p class="login-link">
-            Already have an account? <a href="login.php">Login</a>
+            Already have an account? <a href="login.php">Login here</a>
         </p>
     </div>
 
-    <!-- Footer -->
     <footer>
         &copy; <?= date('Y') ?> MealMate. All rights reserved.
     </footer>

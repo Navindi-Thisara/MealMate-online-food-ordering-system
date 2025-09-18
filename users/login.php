@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once('../includes/db_connect.php'); 
+require_once('../includes/db_connect.php');
 
 $msg = "";
 $redirectUrl = ""; // store where to redirect
@@ -20,10 +20,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $user = $result->fetch_assoc();
             if (password_verify($password, $user['password'])) {
                 // Start session
-                $_SESSION['user_id']   = $user['user_id'];
+                $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['full_name'] = $user['full_name'];
-                $_SESSION['email']     = $user['email'];
-                $_SESSION['role']      = $user['role'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['role'] = $user['role'];
 
                 // Choose redirect page by role
                 if ($user['role'] === 'admin') {
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // Remember Me
                 if ($remember) {
-                    setcookie('email', $email, time() + (86400 * 30), "/"); 
+                    setcookie('email', $email, time() + (86400 * 30), "/");
                     setcookie('password', $password, time() + (86400 * 30), "/");
                 } else {
                     setcookie('email', '', time() - 3600, "/");
@@ -60,17 +60,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Login - MealMate</title>
     <link rel="stylesheet" href="../assets/form.css?v=1">
+    <link rel="stylesheet" href="../assets/style.css">
 
     <?php if (!empty($redirectUrl)): ?>
-        <!-- Redirect after 2 seconds -->
         <meta http-equiv="refresh" content="2;url=<?= $redirectUrl ?>">
     <?php endif; ?>
 </head>
 <body>
-    <!-- Header -->
     <header>
-        <h1>MealMate</h1>
-        <nav>
+        <h1 class="nav-logo">MealMate</h1>
+        <nav class="nav-menu">
             <a href="../index.php">Home</a>
             <a href="register.php">Register</a>
             <a href="../food_management/menu.php">Menu</a>
@@ -78,34 +77,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </nav>
     </header>
 
-    <!-- Login Form -->
     <div class="form-container">
-        <h2>User Login</h2>
+        <?php if (!empty($redirectUrl)): ?>
+            <h2><?= $msg ?></h2>
+        <?php else: ?>
+            <h2>User Login</h2>
 
-        <?php if ($msg != ""): ?>
-            <div class="msg"><?= $msg ?></div>
+            <?php if ($msg != ""): ?>
+                <div class="msg"><?= $msg ?></div>
+            <?php endif; ?>
+
+            <form action="login.php" method="POST">
+                <input type="email" name="email" placeholder="Email Address" required
+                       value="<?= isset($_COOKIE['email']) ? $_COOKIE['email'] : '' ?>">
+                <input type="password" name="password" placeholder="Password" required
+                       value="<?= isset($_COOKIE['password']) ? $_COOKIE['password'] : '' ?>">
+
+                <div class="remember-me">
+                    <input type="checkbox" name="remember" id="remember" <?= isset($_COOKIE['email']) ? 'checked' : '' ?>>
+                    <label for="remember">Remember Me</label>
+                </div>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <p class="login-link">
+                Don't have an account? <a href="register.php">Register here</a>
+            </p>
         <?php endif; ?>
-
-        <form action="login.php" method="POST">
-            <input type="email" name="email" placeholder="Email Address" required
-                   value="<?= isset($_COOKIE['email']) ? $_COOKIE['email'] : '' ?>">
-            <input type="password" name="password" placeholder="Password" required
-                   value="<?= isset($_COOKIE['password']) ? $_COOKIE['password'] : '' ?>">
-
-            <div class="remember-me">
-                <input type="checkbox" name="remember" id="remember" <?= isset($_COOKIE['email']) ? 'checked' : '' ?>>
-                <label for="remember">Remember Me</label>
-            </div>
-
-            <button type="submit">Login</button>
-        </form>
-
-        <p class="login-link">
-            Don't have an account? <a href="register.php">Register here</a>
-        </p>
     </div>
 
-    <!-- Footer -->
     <footer>
         &copy; <?= date('Y'); ?> MealMate. All rights reserved.
     </footer>
