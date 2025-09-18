@@ -13,13 +13,24 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE foods ( 
+<<<<<<< HEAD
+CREATE TABLE foods (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL, 
-    description TEXT, 
-    price DECIMAL(10,2) NOT NULL, 
-    category VARCHAR(50), 
-    image VARCHAR(100) DEFAULT 'default.jpg', 
-    available TINYINT(1) DEFAULT 1, 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    category VARCHAR(50),
+    image VARCHAR(100) DEFAULT 'default.jpg',
+    available TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+=======
+CREATE TABLE foods ( id INT AUTO_INCREMENT PRIMARY KEY,
+ name VARCHAR(100) NOT NULL, 
+ description TEXT, 
+ price DECIMAL(10,2) NOT NULL, 
+ category VARCHAR(50), 
+ image VARCHAR(100) DEFAULT 'default.jpg', 
+ available TINYINT(1) DEFAULT 1, 
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP );
+>>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
