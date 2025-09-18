@@ -90,7 +90,6 @@ $user = $result->fetch_assoc();
 .tabs {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
     margin-bottom: 20px;
     flex-wrap: wrap;
     z-index: 20;
@@ -98,24 +97,15 @@ $user = $result->fetch_assoc();
 .tab {
     padding: 10px 25px;
     background: #222;
-    border-radius: 8px;
+    border-radius: 8px 8px 0 0;
     margin: 0 5px;
-    color: #ff4500; /* New orange color */
+    color: #ff6f00;
     font-weight: bold;
     transition: 0.3s;
     cursor: pointer;
-    border: 2px solid transparent;
 }
-.tab:hover { background: #ff4500; color: #000; }
-.tab.active { 
-    background: #ff4500; 
-    color: #000; 
-    border-color: #ff4500; 
-}
-.tab-active-color {
-    background-color: #ff4500;
-    color: #000;
-}
+.tab:hover { background: #ff6f00; color: #000; }
+.tab.active { background: #ff6f00; color: #000; }
 
 /* === Card Styling === */
 .tab-content {
@@ -150,52 +140,16 @@ $user = $result->fetch_assoc();
     font-size: 14px;
 }
 .tab-content input, .tab-content textarea { background: rgba(255,255,255,0.1); color: #fff; }
-.tab-content button { background: #ff4500; color: #000; cursor: pointer; font-weight: bold; }
+.tab-content button { background: #ff6f00; color: #000; cursor: pointer; font-weight: bold; }
 .tab-content button:hover { background: #e65c00; }
 
 /* === Messages === */
 .msg { margin-bottom: 15px; font-size: 14px; color: #ffcc80; }
 
-/* === Header Styling === */
-header {
-    background: #000;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 3px solid #ff4500;
-}
-
-.nav-logo {
-    color: #ff4500;
-    font-size: 28px;
-    font-weight: bold;
-    margin: 0;
-}
-
-.nav-menu {
-    display: flex;
-    gap: 25px;
-}
-
-.nav-menu a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 16px;
-    transition: color 0.3s;
-}
-
-.nav-menu a:hover {
-    color: #ff4500;
-}
-
 /* === Responsive === */
 @media (max-width: 480px) {
     .tabs { flex-direction: column; }
     .tab { margin: 5px 0; text-align: center; }
-    header { flex-direction: column; text-align: center; }
-    .nav-menu { flex-direction: column; gap: 10px; margin-top: 10px; }
 }
 </style>
 </head>

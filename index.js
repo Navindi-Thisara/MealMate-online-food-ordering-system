@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 // Sidebar toggle  
-=======
-// Sidebar toggle  
->>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a
 const sideNav = document.getElementById('sideNav');
 const menuBtn = document.getElementById('menuBtn');
 
@@ -72,7 +68,6 @@ setInterval(() => {
 
 // Initial call to set up the first slide
 updateSlideshow();
-<<<<<<< HEAD
 
 /* --- Header Highlight Fix --- */
 
@@ -120,5 +115,3 @@ navLinks.forEach(link => {
         }
     });
 });
-=======
->>>>>>> b0ceea530be018fda6373c9e10c1644792d6a83a

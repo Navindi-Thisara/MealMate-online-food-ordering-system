@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once('../includes/db_connect.php'); 
+require_once('../includes/db_connect.php');
 
 $msg = "";
-$redirect = false;
+$redirectUrl = ""; // store where to redirect
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
@@ -19,18 +19,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows == 1) {
             $user = $result->fetch_assoc();
             if (password_verify($password, $user['password'])) {
-                $msg = "✅ Login successful! Redirecting to menu...";
-                $redirect = true;
-
                 // Start session
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['full_name'] = $user['full_name'];
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['role'] = $user['role'];
 
+                // Choose redirect page by role
+                if ($user['role'] === 'admin') {
+                    $msg = "✅ Login successful! Redirecting to Admin Dashboard...";
+                    $redirectUrl = "../users/dashboard.php";
+                } else {
+                    $msg = "✅ Login successful! Redirecting to Menu...";
+                    $redirectUrl = "../food_management/menu.php";
+                }
+
                 // Remember Me
                 if ($remember) {
-                    setcookie('email', $email, time() + (86400 * 30), "/"); 
+                    setcookie('email', $email, time() + (86400 * 30), "/");
                     setcookie('password', $password, time() + (86400 * 30), "/");
                 } else {
                     setcookie('email', '', time() - 3600, "/");
@@ -48,21 +54,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Login - MealMate</title>
     <link rel="stylesheet" href="../assets/form.css?v=1">
-    <?php if ($redirect): ?>
-        <meta http-equiv="refresh" content="2;url=../food_management/menu.php">
+    <link rel="stylesheet" href="../assets/style.css">
+
+    <?php if (!empty($redirectUrl)): ?>
+        <meta http-equiv="refresh" content="2;url=<?= $redirectUrl ?>">
     <?php endif; ?>
 </head>
 <body>
     <header>
-        <h1>MealMate</h1>
-        <nav>
+        <h1 class="nav-logo">MealMate</h1>
+        <nav class="nav-menu">
             <a href="../index.php">Home</a>
             <a href="register.php">Register</a>
             <a href="../food_management/menu.php">Menu</a>
@@ -70,12 +77,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </nav>
     </header>
 
-    <?php if ($redirect): ?>
-        <div class="form-container">
-            <div class="msg-success"><?= $msg ?></div>
-        </div>
-    <?php else: ?>
-        <div class="form-container">
+    <div class="form-container">
+        <?php if (!empty($redirectUrl)): ?>
+            <h2><?= $msg ?></h2>
+        <?php else: ?>
             <h2>User Login</h2>
 
             <?php if ($msg != ""): ?>
@@ -99,8 +104,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <p class="login-link">
                 Don't have an account? <a href="register.php">Register here</a>
             </p>
-        </div>
-    <?php endif; ?>
+        <?php endif; ?>
+    </div>
 
     <footer>
         &copy; <?= date('Y'); ?> MealMate. All rights reserved.
