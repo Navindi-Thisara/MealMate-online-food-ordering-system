@@ -37,11 +37,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Register - MealMate</title>
     <link rel="stylesheet" href="../assets/form.css?v=1">
+    <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
     <header>
-        <h1>MealMate</h1>
-        <nav>
+        <h1 class="nav-logo">MealMate</h1>
+        <nav class="nav-menu">
             <a href="../index.php">Home</a>
             <a href="login.php">Login</a>
             <a href="../food_management/menu.php">Menu</a>
@@ -66,6 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <p class="login-link">
             Already have an account? <a href="login.php">Login here</a>
+        </p>
+        <p class="login-link">
+            Are you an administrator? <a href="register_admin.php">Register as Admin</a>
         </p>
     </div>
 

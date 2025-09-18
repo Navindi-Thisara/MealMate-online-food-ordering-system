@@ -1,15 +1,27 @@
-
 <?php
 session_start();
 include '../includes/db_connect.php';
 
-// Ensure user is logged in
+// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
+// Fetch user data to check role
 $user_id = $_SESSION['user_id'];
+$stmt = $conn->prepare("SELECT role FROM users WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+// Redirect admin users to the admin dashboard
+if ($user && $user['role'] === 'admin') {
+    header("Location: ../admin/admin_dashboard.php");
+    exit();
+}
+
 $msg_profile = $msg_password = "";
 
 // --- Handle Profile Update ---
@@ -58,20 +70,21 @@ if (isset($_POST['change_password'])) {
     }
 }
 
-// --- Fetch current user data ---
+// Fetch user data again, as it might have been updated
 $stmt = $conn->prepare("SELECT full_name, email, contact_no, address, role, created_at FROM users WHERE user_id=?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>User Dashboard - MealMate</title>
 <link rel="stylesheet" href="../assets/form.css">
+<link rel="stylesheet" href="../assets/style.css">
 <style>
 /* === Tabs Styling === */
 .tabs {
@@ -110,7 +123,7 @@ $user = $result->fetch_assoc();
     transition: transform 0.3s, box-shadow 0.3s;
 }
 .tab-content.active { display: block; }
-.tab-content:hover { 
+.tab-content:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 25px rgba(255,69,0,0.7);
 }
@@ -142,8 +155,8 @@ $user = $result->fetch_assoc();
 </head>
 <body>
 <header>
-<h1>MealMate</h1>
-<nav>
+<h1 class="nav-logo">MealMate</h1>
+<nav class="nav-menu">
 <a href="../index.php">Home</a>
 <a href="dashboard.php">Dashboard</a>
 <a href="../cart/cart.php">Cart</a>
