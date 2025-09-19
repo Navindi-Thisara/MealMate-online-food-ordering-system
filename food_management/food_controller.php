@@ -1,168 +1,321 @@
-<?php
-session_start();
-require_once '../includes/db_connect.php';
+/* === Global Styles === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-// Handle different actions based on the 'action' parameter
-$action = $_GET['action'] ?? '';
-
-switch ($action) {
-    case 'add_to_cart':
-        addToCart();
-        break;
-    case 'add_food':
-        addFood();
-        break;
-    case 'edit_food':
-        editFood();
-        break;
-    case 'delete_food':
-        deleteFood();
-        break;
-    default:
-        // Respond with an error for an invalid action
-        echo json_encode(['success' => false, 'message' => 'Invalid action']);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-// --- Function to add a food item to the database ---
-function addFood() {
-    global $conn;
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    scroll-behavior: smooth;
+    background-color: #0d0d0d;
+    overflow-x: hidden;
+    position: relative;
+}
 
-    // Admin check
-    if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-        echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
-        return;
+/* === Navbar Styles === */
+.navbar {
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid #FF4500;
+    padding: 20px 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo {
+    color: #FF4500;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 3px 3px 6px #000;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-menu a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    padding: 0;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #FF4500;
+    transition: width 0.3s ease;
+}
+
+.nav-menu a:hover,
+.nav-menu a.active {
+    color: #FF4500;
+}
+
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+    width: 100%;
+}
+
+/* === Main Content Container === */
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 120px auto 2rem auto;
+    padding: 0 50px;
+}
+
+/* === Header Section === */
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.header h2 {
+    color: #ff4500;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    color: #cccccc;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.header::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    height: 2px;
+    background-color: #ff4500;
+    margin-left: calc(-50vw + 50%);
+}
+
+/* === Category Title === */
+.category-title {
+    color: #FF4500;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+}
+
+.category-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: #FF4500;
+    border-radius: 5px;
+}
+
+/* === Menu Grid === */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.menu-item {
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    padding: 1.5rem;
+    border: 2px solid #333;
+    transition: transform 0.3s, border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+    border-color: #ff4500;
+}
+
+.food-image {
+    width: 100%;
+    height: 200px;
+    background-color: #333;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.food-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.menu-item h3 {
+    color: #ff4500;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.menu-item p {
+    color: #cccccc;
+    line-height: 1.4;
+    height: 50px; /* Initial fixed height for consistent alignment */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Shows "..." if text exceeds initial height */
+    margin-bottom: 1rem;
+    transition: height 0.3s ease-in-out; /* Smooth transition for expansion */
+}
+
+.menu-item:hover p {
+    height: auto; /* Expand height on hover */
+    max-height: 100px; /* Prevents descriptions from being excessively long */
+    overflow: auto; /* Allows scrolling if still too long */
+    text-overflow: clip; /* Removes ellipsis on hover */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.menu-item:hover p::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.menu-item:hover p {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+
+.item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.price {
+    color: #ff4500;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.add-to-cart {
+    background-color: #ff4500;
+    color: #000;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background-color: #fff;
+    color: #ff4500;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 20px;
     }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $name = $_POST['name'];
-        $description = $_POST['description'];
-        $price = $_POST['price'];
-        $category = $_POST['category'];
+    .container {
+        margin: 100px auto 1.5rem auto;
+        padding: 0 20px;
+    }
 
-        // Handle image upload
-        $image = 'default.jpg';
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $image = uniqid() . '_' . $_FILES['image']['name'];
-            move_uploaded_file($_FILES['image']['tmp_name'], '../assets/images/' . $image);
-        }
+    .header {
+        margin-bottom: 1.5rem;
+    }
 
-        $sql = "INSERT INTO foods (name, description, price, category, image, available) 
-                VALUES (?, ?, ?, ?, ?, 1)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssdss", $name, $description, $price, $category, $image);
-        
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Food item added successfully!']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error adding food item: ' . $conn->error]);
-        }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+    .header h2 {
+        font-size: 1.8rem;
+    }
+
+    .header p {
+        font-size: 1rem;
+    }
+
+    .menu-grid {
+        gap: 1.5rem;
+        margin-top: 0.5rem;
     }
 }
 
-// --- Function to edit a food item in the database ---
-function editFood() {
-    global $conn;
-
-    // Admin check
-    if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-        echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
-        return;
+@media (max-width: 480px) {
+    .navbar {
+        padding: 10px 1rem;
     }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $food_id = $_POST['id'];
-        $name = $_POST['name'];
-        $description = $_POST['description'];
-        $price = $_POST['price'];
-        $category = $_POST['category'];
-        $available = isset($_POST['available']) ? 1 : 0;
+    .nav-logo {
+        font-size: 24px;
+    }
 
-        // Check if a new image was uploaded
-        $image = $_POST['current_image'] ?? 'default.jpg';
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $image = uniqid() . '_' . $_FILES['image']['name'];
-            move_uploaded_file($_FILES['image']['tmp_name'], '../assets/images/' . $image);
-        }
+    .nav-menu {
+        gap: 1rem;
+    }
 
-        $sql = "UPDATE foods SET name = ?, description = ?, price = ?, category = ?, image = ?, available = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssdssii", $name, $description, $price, $category, $image, $available, $food_id);
+    .nav-menu a {
+        font-size: 12px;
+        padding: 0.4rem 0.8rem;
+    }
 
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Food item updated successfully!']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error updating food item: ' . $conn->error]);
-        }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+    .header h2 {
+        font-size: 1.5rem;
+    }
+
+    .header p {
+        font-size: 0.9rem;
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
-
-
-// --- Function to soft delete a food item ---
-function deleteFood() {
-    global $conn;
-
-    // Admin check
-    if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-        echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
-        return;
-    }
-
-    $food_id = $_GET['id'] ?? 0;
-
-    if ($food_id) {
-        // Soft delete by setting available to 0
-        $sql = "UPDATE foods SET available = 0 WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $food_id);
-        
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Food item deleted successfully!']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error deleting food item: ' . $conn->error]);
-        }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Food ID not specified.']);
-    }
-}
-
-// --- Function to add a food item to the user's cart ---
-function addToCart() {
-    global $conn;
-    
-    if (!isset($_SESSION['user_id'])) {
-        echo json_encode(['success' => false, 'message' => 'Please login first']);
-        return;
-    }
-    
-    $food_id = $_GET['food_id'];
-    $user_id = $_SESSION['user_id'];
-    
-    // Check if item already in cart
-    $sql = "SELECT * FROM cart WHERE user_id = ? AND food_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $user_id, $food_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows > 0) {
-        // Update quantity
-        $sql = "UPDATE cart SET quantity = quantity + 1 WHERE user_id = ? AND food_id = ?";
-    } else {
-        // Insert new item
-        $sql = "INSERT INTO cart (user_id, food_id, quantity) VALUES (?, ?, 1)";
-    }
-    
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $user_id, $food_id);
-    
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Added to cart']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Error adding to cart']);
-    }
-}
-?>
