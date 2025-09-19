@@ -2,6 +2,7 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+// Corrected include path for db_connect.php
 include '../includes/db_connect.php';
 
 // Check if user is logged in
@@ -25,6 +26,8 @@ if (isset($_POST['update_profile'])) {
 
     if ($stmt->execute()) {
         $msg_profile = "✅ Profile updated successfully!";
+        // Update session variables after successful profile update
+        $_SESSION['full_name'] = $full_name;
     } else {
         $msg_profile = "❌ Error updating profile: " . $conn->error;
     }
@@ -67,9 +70,9 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
+$is_admin = $user['role'] === 'admin';
 
 $base_path = '/MealMate-online-food-ordering-system';
-$current_page = basename($_SERVER['PHP_SELF']);
 $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'view_profile';
 ?>
 <!DOCTYPE html>
@@ -80,94 +83,103 @@ $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'view_profile';
 <link rel="stylesheet" href="../assets/form.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-/* === Header Styling === */
-.navbar {
-    background: #000;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 3px solid #ff4500;
-}
+/* === Global Styles === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-.nav-logo {
-    color: #ff4500;
-    font-size: 28px;
-    font-weight: bold;
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.nav-container {
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    scroll-behavior: smooth;
+    background-color: #0d0d0d;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* === Navbar Styles === */
+.navbar {
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid #FF4500;
+    padding: 20px 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+.nav-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo {
+    color: #FF4500;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 3px 3px 6px #000;
+}
+
 .nav-menu {
     display: flex;
-    gap: 25px;
     list-style: none;
-    margin: 0;
-    padding: 0;
+    gap: 2rem;
+    align-items: center;
 }
 
-.nav-menu li a {
+.nav-menu a {
     color: #fff;
     text-decoration: none;
-    font-weight: bold;
-    font-size: 16px;
-    transition: color 0.3s;
-}
-
-.nav-menu li a:hover,
-.nav-menu li a.active {
-    color: #ff4500;
-}
-
-/* === Dropdown Styling === */
-.dropdown {
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    padding: 0;
     position: relative;
-    display: inline-block;
+    transition: color 0.3s ease;
 }
 
-.dropdown-content {
-    display: none;
+.nav-menu a::after {
+    content: '';
     position: absolute;
-    background-color: #333;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 8px;
-    border: 1px solid #ff4500;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #FF4500;
+    transition: width 0.3s ease;
 }
 
-.dropdown-content a {
-    color: white;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    font-weight: normal;
-    font-size: 14px;
+.nav-menu a:hover,
+.nav-menu a.active {
+    color: #FF4500;
 }
 
-.dropdown-content a:hover {
-    background-color: #ff4500;
-    color: black;
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+    width: 100%;
 }
 
-.dropdown:hover .dropdown-content {
-    display: block;
-}
 
 /* === Tabs Styling === */
 .tabs {
     display: flex;
     justify-content: center;
-    margin-top: 80px;
+    margin-top: 120px; /* Adjusted to be below the fixed header */
     margin-bottom: 20px;
     flex-wrap: wrap;
     z-index: 1;
@@ -226,28 +238,27 @@ $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'view_profile';
 .tab-content button { background: #ff4500; color: #000; cursor: pointer; font-weight: bold; }
 .tab-content button:hover { background: #e65c00; }
 
-/* === Messages === */
-.msg { margin-bottom: 15px; font-size: 14px; color: #ffcc80; }
-
 /* === Responsive === */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .navbar {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .nav-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .nav-menu {
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 10px;
+        padding: 15px 20px;
     }
     .tabs {
-        margin-top: 20px;
+        margin-top: 100px;
+    }
+}
+@media (max-width: 480px) {
+    .navbar {
+        padding: 10px 1rem;
+    }
+    .nav-logo {
+        font-size: 24px;
+    }
+    .nav-menu {
+        gap: 1rem;
+    }
+    .nav-menu a {
+        font-size: 12px;
     }
 }
 </style>
@@ -259,17 +270,18 @@ $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'view_profile';
             <h1 class="nav-logo">MealMate</h1>
             <ul class="nav-menu">
                 <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
-                <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="<?php echo $base_path; ?>/cart/cart.php">Cart</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropbtn active">Profile</a>
-                    <div class="dropdown-content">
-                        <a href="?tab=view_profile">View Profile</a>
-                        <a href="?tab=edit_profile">Edit Profile</a>
-                        <a href="?tab=change_password">Change Password</a>
-                    </div>
-                </li>
-                <li><a href="logout.php">Logout</a></li>
+                <?php if ($is_admin): ?>
+                    <!-- Admin Navigation -->
+                    <li><a href="<?php echo $base_path; ?>/users/admin/admin_dashboard.php">Dashboard</a></li>
+                    <li><a href="profile.php" class="active">Profile</a></li>
+                    <li><a href="logout.php">Logout</a></li>
+                <?php else: ?>
+                    <!-- User Navigation -->
+                    <li><a href="<?php echo $base_path; ?>/menu.php">Menu</a></li>
+                    <li><a href="<?php echo $base_path; ?>/cart/cart.php">Cart</a></li>
+                    <li><a href="profile.php" class="active">Profile</a></li>
+                    <li><a href="logout.php">Logout</a></li>
+                <?php endif; ?>
             </ul>
         </div>
     </nav>

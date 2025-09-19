@@ -1,230 +1,297 @@
 <?php
+// === START: Error Reporting for debugging ===
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+// === END: Error Reporting for debugging ===
+
+if (session_status() == PHP_SESSION_NONE) {
 session_start();
-include '../includes/db_connect.php';
+}
+// Corrected include path to go up two directories
+include '../../includes/db_connect.php';
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+// Check if user is logged in and has admin role
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../users/login.php");
     exit();
 }
 
-// Fetch user data to check role
-$user_id = $_SESSION['user_id'];
-$stmt = $conn->prepare("SELECT role FROM users WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-// Redirect admin users to the admin dashboard
-if ($user && $user['role'] === 'admin') {
-    header("Location: ../admin/admin_dashboard.php");
-    exit();
-}
-
-$msg_profile = $msg_password = "";
-
-// --- Handle Profile Update ---
-if (isset($_POST['update_profile'])) {
-    $full_name  = trim($_POST['full_name']);
-    $email      = trim($_POST['email']);
-    $contact_no = trim($_POST['contact_no']);
-    $address    = trim($_POST['address']);
-
-    $stmt = $conn->prepare("UPDATE users SET full_name=?, email=?, contact_no=?, address=? WHERE user_id=?");
-    $stmt->bind_param("ssssi", $full_name, $email, $contact_no, $address, $user_id);
-
-    if ($stmt->execute()) {
-        $msg_profile = "✅ Profile updated successfully!";
-    } else {
-        $msg_profile = "❌ Error updating profile: " . $conn->error;
-    }
-}
-
-// --- Handle Password Change ---
-if (isset($_POST['change_password'])) {
-    $current_password = $_POST['current_password'];
-    $new_password     = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    $stmt = $conn->prepare("SELECT password FROM users WHERE user_id=?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user_pass = $result->fetch_assoc();
-
-    if (!$user_pass || !password_verify($current_password, $user_pass['password'])) {
-        $msg_password = "❌ Current password is incorrect!";
-    } elseif ($new_password !== $confirm_password) {
-        $msg_password = "❌ New password and confirm password do not match!";
-    } else {
-        $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-        $stmt_update = $conn->prepare("UPDATE users SET password=? WHERE user_id=?");
-        $stmt_update->bind_param("si", $hashed_password, $user_id);
-
-        if ($stmt_update->execute()) {
-            $msg_password = "✅ Password changed successfully!";
-        } else {
-            $msg_password = "❌ Error updating password: " . $conn->error;
-        }
-    }
-}
-
-// Fetch user data again, as it might have been updated
-$stmt = $conn->prepare("SELECT full_name, email, contact_no, address, role, created_at FROM users WHERE user_id=?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
+$base_path = '/MealMate-online-food-ordering-system';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>User Dashboard - MealMate</title>
-<link rel="stylesheet" href="../assets/form.css">
-<link rel="stylesheet" href="../assets/style.css">
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - MealMate</title>
+    <link rel="stylesheet" href="../assets/form.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-/* === Tabs Styling === */
-.tabs {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    z-index: 20;
-}
-.tab {
-    padding: 10px 25px;
-    background: #222;
-    border-radius: 8px 8px 0 0;
-    margin: 0 5px;
-    color: #ff6f00;
-    font-weight: bold;
-    transition: 0.3s;
-    cursor: pointer;
-}
-.tab:hover { background: #ff6f00; color: #000; }
-.tab.active { background: #ff6f00; color: #000; }
+/* === Global Styles === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-/* === Card Styling === */
-.tab-content {
-    display: none;
-    background: rgba(20,20,20,0.95);
-    padding: 25px;
-    border-radius: 12px;
-    border: 2px solid #FF4500; /* Orange border */
-    box-shadow: 0 4px 20px rgba(255,69,0,0.5);
-    width: 400px;
-    max-width: 90%;
-    margin: 10px auto 50px auto;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    scroll-behavior: smooth;
+    background-color: #0d0d0d;
+    overflow-x: hidden;
     position: relative;
-    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* === Navbar Styles === */
+.navbar {
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid #FF4500;
+    padding: 20px 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo {
+    color: #FF4500;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 3px 3px 6px #000;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-menu a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    padding: 0;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #FF4500;
+    transition: width 0.3s ease;
+}
+
+.nav-menu a:hover,
+.nav-menu a.active {
+    color: #FF4500;
+}
+
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+    width: 100%;
+}
+
+/* === Content Styling === */
+.main-content {
+    flex: 1;
+}
+
+.dashboard-container {
+    padding-top: 150px; /* Adjusted to be below the fixed header */
+    text-align: center;
+}
+
+.dashboard-card {
+    background: rgba(20,20,20,0.95);
+    padding: 40px;
+    border-radius: 12px;
+    border: 2px solid #FF4500;
+    box-shadow: 0 4px 20px rgba(255,69,0,0.5);
+    width: 600px;
+    max-width: 90%;
+    margin: 50px auto;
     transition: transform 0.3s, box-shadow 0.3s;
 }
-.tab-content.active { display: block; }
-.tab-content:hover {
+
+.dashboard-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 25px rgba(255,69,0,0.7);
 }
 
-/* === Form Inputs === */
-.tab-content input,
-.tab-content textarea,
-.tab-content button {
-    width: 95%;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 6px;
-    border: none;
-    font-size: 14px;
+.dashboard-card h2 {
+    color: #fff;
+    font-size: 2.5em;
+    margin-bottom: 10px;
 }
-.tab-content input, .tab-content textarea { background: rgba(255,255,255,0.1); color: #fff; }
-.tab-content button { background: #ff6f00; color: #000; cursor: pointer; font-weight: bold; }
-.tab-content button:hover { background: #e65c00; }
 
-/* === Messages === */
-.msg { margin-bottom: 15px; font-size: 14px; color: #ffcc80; }
+.dashboard-card p {
+    color: #aaa;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
 
-/* === Responsive === */
+.dashboard-card .quick-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.dashboard-card .quick-links a {
+    text-decoration: none;
+    background: #ff4500;
+    color: #000;
+    font-weight: bold;
+    padding: 12px 25px;
+    border-radius: 8px;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.dashboard-card .quick-links a:hover {
+    background: #e65c00;
+    transform: translateY(-2px);
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 20px;
+    }
+    .nav-logo {
+        font-size: 24px;
+    }
+    .nav-menu {
+        gap: 1.5rem;
+    }
+    .nav-menu a {
+        font-size: 16px;
+    }
+    .dashboard-container {
+        padding-top: 120px;
+    }
+    .dashboard-card {
+        padding: 30px;
+    }
+    .dashboard-card h2 {
+        font-size: 2em;
+    }
+    .dashboard-card p {
+        font-size: 1.1em;
+    }
+}
+
 @media (max-width: 480px) {
-    .tabs { flex-direction: column; }
-    .tab { margin: 5px 0; text-align: center; }
+    .navbar {
+        padding: 10px 1rem;
+    }
+    .nav-logo {
+        font-size: 20px;
+    }
+    .nav-menu {
+        gap: 1rem;
+    }
+    .nav-menu a {
+        font-size: 14px;
+    }
+    .dashboard-card {
+        padding: 20px;
+    }
+    .dashboard-card h2 {
+        font-size: 1.8em;
+    }
+    .dashboard-card p {
+        font-size: 1em;
+    }
+    .dashboard-card .quick-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Footer styles for the copyright text */
+.simple-footer {
+    background-color: #0d0d0d;
+    color: #fff;
+    padding: 10px 0; /* Reduced padding for a slimmer footer */
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    position: relative;
+    width: 100%;
+    margin-top: auto; /* Pushes the footer to the bottom */
+}
+
+/* Orange line above the footer text */
+.simple-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #FF4500;
 }
 </style>
 </head>
 <body>
-<header>
-<h1 class="nav-logo">MealMate</h1>
-<nav class="nav-menu">
-<a href="../index.php">Home</a>
-<a href="dashboard.php">Dashboard</a>
-<a href="../cart/cart.php">Cart</a>
-<a href="logout.php">Logout</a>
-</nav>
-</header>
-
-<!-- === Tabs === -->
-<div class="tabs">
-<div class="tab active" data-tab="view_profile">View Profile</div>
-<div class="tab" data-tab="edit_profile">Edit Profile</div>
-<div class="tab" data-tab="change_password">Change Password</div>
-</div>
-
-<!-- === Tab Contents (Cards) === -->
-<div id="view_profile" class="tab-content active">
-<h2>Your Profile</h2>
-<p><strong>Full Name:</strong> <?= htmlspecialchars($user['full_name']) ?></p>
-<p><strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
-<p><strong>Contact No:</strong> <?= htmlspecialchars($user['contact_no']) ?></p>
-<p><strong>Address:</strong> <?= htmlspecialchars($user['address']) ?></p>
-<p><strong>Role:</strong> <?= htmlspecialchars($user['role']) ?></p>
-<p><strong>Joined On:</strong> <?= htmlspecialchars($user['created_at']) ?></p>
-</div>
-
-<div id="edit_profile" class="tab-content">
-<h2>Edit Profile</h2>
-<?php if ($msg_profile != ""): ?><div class="msg"><?= $msg_profile ?></div><?php endif; ?>
-<form method="POST">
-<input type="text" name="full_name" value="<?= htmlspecialchars($user['full_name']) ?>" required>
-<input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
-<input type="text" name="contact_no" value="<?= htmlspecialchars($user['contact_no']) ?>" required>
-<textarea name="address" required><?= htmlspecialchars($user['address']) ?></textarea>
-<button type="submit" name="update_profile">Update Profile</button>
-</form>
-</div>
-
-<div id="change_password" class="tab-content">
-<h2>Change Password</h2>
-<?php if ($msg_password != ""): ?><div class="msg"><?= $msg_password ?></div><?php endif; ?>
-<form method="POST">
-<input type="password" name="current_password" placeholder="Current Password" required>
-<input type="password" name="new_password" placeholder="New Password" required>
-<input type="password" name="confirm_password" placeholder="Confirm New Password" required>
-<button type="submit" name="change_password">Update Password</button>
-</form>
-</div>
-
-<footer>
-&copy; <?= date('Y') ?> MealMate. All rights reserved.
-</footer>
-
-<script>
-// Tab switching logic
-window.onload = function() {
-    const tabs = document.querySelectorAll('.tab');
-    const contents = document.querySelectorAll('.tab-content');
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active'));
-
-            tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).classList.add('active');
-        });
-    });
-};
-</script>
+    <div class="main-content">
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="nav-logo">MealMate</h1>
+                <ul class="nav-menu">
+                    <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
+                    <li><a href="admin_dashboard.php" class="active">Dashboard</a></li>
+                    <li><a href="manage_food.php">Manage Food</a></li>
+                    <li><a href="manage_users.php">Manage Users</a></li>
+                    <li><a href="manage_orders.php">Manage Orders</a></li>
+                    <li><a href="../logout.php">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="dashboard-container">
+            <div class="dashboard-card">
+                <h2>Welcome, Admin <?= htmlspecialchars($_SESSION['full_name']) ?>!</h2>
+                <p>This is your administrative control panel.</p>
+                <div class="quick-links">
+                    <a href="manage_food.php">Manage Food</a>
+                    <a href="manage_users.php">Manage Users</a>
+                    <a href="manage_orders.php">Manage Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="simple-footer">
+        &copy; 2025 MealMate. All rights reserved.
+    </div>
 </body>
 </html>

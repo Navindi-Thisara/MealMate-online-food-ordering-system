@@ -1,8 +1,33 @@
 <?php
 session_start();
+
 include '../includes/menu_header.php';
 require_once '../includes/db_connect.php';
 ?>
+
+<style>
+/* === Custom Alert Box Styles === */
+.custom-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #28a745;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    text-align: center;
+    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
+}
+.custom-alert.error {
+    background-color: #dc3545;
+}
+</style>
 
 <div class="container">
     <div class="header">
@@ -13,12 +38,12 @@ require_once '../includes/db_connect.php';
     <?php
     if ($conn !== null && $conn->connect_error === null) {
         // Fetch distinct categories in a specific order
-        $sql_categories = "SELECT DISTINCT category FROM foods WHERE available = 1 
-                           ORDER BY 
+        $sql_categories = "SELECT DISTINCT category FROM foods WHERE available = 1
+                           ORDER BY
                                CASE category
                                    WHEN 'Burgers and Sandwiches' THEN 1
                                    WHEN 'Pizzas' THEN 2
-                                   WHEN 'Pasta' THEN 3
+                                   WHEN 'Pastas' THEN 3
                                    WHEN 'Appetizers' THEN 4
                                    WHEN 'Desserts' THEN 5
                                    ELSE 6
@@ -28,11 +53,11 @@ require_once '../includes/db_connect.php';
         if ($result_categories && $result_categories->num_rows > 0) {
             while ($category_row = $result_categories->fetch_assoc()) {
                 $category_name = $category_row['category'];
-                
+
                 // Display category heading
                 echo '<h2 class="category-title">' . htmlspecialchars($category_name) . '</h2>';
                 echo '<div class="menu-grid">';
-                
+
                 // Fetch food items for the current category
                 $sql_foods = "SELECT * FROM foods WHERE available = 1 AND category = ? ORDER BY name";
                 $stmt_foods = $conn->prepare($sql_foods);
@@ -49,14 +74,15 @@ require_once '../includes/db_connect.php';
                         } elseif ($image_folder_name === 'pasta') {
                             $image_folder_name = 'pastas';
                         }
-                        
+
                         // Construct the image path relative to the menu.php file
                         $image_path = '../assets/images/menu/' . $image_folder_name . '/' . $food_row['image'];
 
                         echo '
                         <div class="menu-item">
                             <div class="food-image">
-                                <img src="' . htmlspecialchars($image_path) . '" alt="' . htmlspecialchars($food_row["name"]) . '" 
+                                <img src="' . htmlspecialchars($image_path) . '" 
+                                     alt="' . htmlspecialchars($food_row["name"]) . '"
                                      onerror="this.src=\'../assets/images/menu/default.jpg\';">
                             </div>
                             <h3>' . htmlspecialchars($food_row["name"]) . '</h3>
@@ -80,17 +106,38 @@ require_once '../includes/db_connect.php';
 </div>
 
 <script>
-    function addToCart(foodId) {
-        fetch('food_controller.php?action=add_to_cart&food_id=' + foodId)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Added to cart successfully!');
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            });
+function showAlert(message, isError = false) {
+    const alertBox = document.createElement('div');
+    alertBox.textContent = message;
+    alertBox.classList.add('custom-alert');
+    if (isError) {
+        alertBox.classList.add('error');
     }
+    document.body.appendChild(alertBox);
+
+    // Fade out and remove
+    setTimeout(() => {
+        alertBox.style.opacity = '0';
+        setTimeout(() => alertBox.remove(), 500);
+    }, 2000);
+}
+
+function addToCart(foodId) {
+    fetch('food_controller.php?action=add_to_cart&food_id=' + foodId)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Added to cart successfully!');
+            } else {
+                showAlert('Error: ' + data.message, true);
+            }
+        })
+        .catch(() => {
+            showAlert('Error: Failed to connect to server.', true);
+        });
+}
 </script>
-</body>
-</html>
+
+<?php
+include '../includes/footer.php';
+?>

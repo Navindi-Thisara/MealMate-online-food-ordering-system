@@ -78,9 +78,10 @@ include 'includes/header.php';
     </form>
 </section>
     
-<footer>
-    &copy; <?php echo date('Y'); ?> MealMate. All rights reserved.
-</footer>
+<?php 
+// Include footer file
+include 'includes/footer.php';
+?>
 
 <script src="index.js" defer></script>
 </body>
