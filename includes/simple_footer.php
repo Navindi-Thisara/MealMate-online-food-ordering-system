@@ -2,7 +2,7 @@
     /* Footer styles for the copyright text */
     .simple-footer {
         background-color: #0d0d0d; /* Match the body background */
-        color: #fff;
+        color: #FF4500;
         padding: 20px 0;
         text-align: center;
         font-family: 'Poppins', sans-serif;

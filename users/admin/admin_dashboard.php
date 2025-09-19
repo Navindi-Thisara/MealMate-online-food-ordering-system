@@ -37,6 +37,10 @@ body {
     background-color: #0d0d0d;
     overflow-x: hidden;
     position: relative;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full viewport height */
 }
 
 /* === Navbar Styles === */
@@ -116,6 +120,7 @@ body {
 .dashboard-container {
     padding-top: 150px; /* Adjusted to be below the fixed header */
     text-align: center;
+    flex: 1; /* Pushes footer down */
 }
 
 .dashboard-card {
@@ -224,7 +229,8 @@ body {
         gap: 10px;
     }
 }
-/* Footer styles for the copyright text */
+
+/* === Footer Styles === */
 .simple-footer {
     background-color: #0d0d0d; /* Match the body background */
     color: #fff;
@@ -232,9 +238,9 @@ body {
     text-align: center;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
-    position: relative; /* Allows the orange line to be positioned relative to the footer */
-    width: 100%; /* Make footer span full width */
-    margin: 0;   /* Remove any auto-centering */
+    width: 100%;
+    position: relative;
+    margin-top: auto; /* Keeps footer at bottom */
 }
 
 /* Orange line above the footer text */
@@ -245,7 +251,7 @@ body {
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: #FF4500; /* The requested orange color */
+    background-color: #FF4500;
 }
 </style>
 </head>

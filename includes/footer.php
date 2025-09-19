@@ -5,7 +5,7 @@ background-color: rgba(0, 0, 0, 0.9);
 backdrop-filter: blur(10px);
 border-top: 2px solid #FF4500;
 padding: 50px 30px 20px;
-color: #fff;
+color: #FF4500;
 font-family: 'Poppins', sans-serif;
 }
 
@@ -56,7 +56,7 @@ border-radius: 2px;
 .footer-section ul,
 .footer-section a {
 font-size: 14px;
-color: #ccc;
+color: #FF4500;
 line-height: 1.7;
 text-decoration: none;
 }

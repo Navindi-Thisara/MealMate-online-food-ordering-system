@@ -65,6 +65,85 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php if (!empty($redirectUrl)): ?>
         <meta http-equiv="refresh" content="2;url=<?= $redirectUrl ?>">
     <?php endif; ?>
+    <style>
+        /* Flexbox layout for sticky footer */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #0d0d0d;
+            color: #fff;
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .form-container {
+            flex: 1; /* Push footer down */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+            max-width: 90%;
+        }
+
+        .form-container input,
+        .form-container button {
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+        }
+
+        .form-container button {
+            background: #ff4500;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background: #e65c00;
+        }
+
+        .msg {
+            margin-bottom: 15px;
+            color: #ff4500;
+        }
+
+        .simple-footer {
+            background-color: #0d0d0d;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 14px;
+            width: 100%;
+            margin-top: auto; /* Footer sticks to bottom */
+            position: relative;
+        }
+
+        .simple-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #FF4500;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -107,6 +186,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
     </div>
 
-    <?php include '../includes/simple_footer.php'; ?>
+    <div class="simple-footer">
+        &copy; 2025 MealMate. All rights reserved.
+    </div>
 </body>
 </html>
