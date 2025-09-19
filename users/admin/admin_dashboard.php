@@ -1,264 +1,279 @@
 <?php
-session_start();
-include("../../includes/db_connect.php");
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+// Corrected include path to go up two directories
+include '../../includes/db_connect.php';
 
-// --- Admin Check ---
+// Check if user is logged in and has admin role
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    echo "<h2 style='color:red;text-align:center;margin-top:50px;'>❌ Access Denied: Admins only!</h2>";
+    header("Location: ../users/login.php");
     exit();
 }
 
-// --- Messages ---
-$msg = "";
-
-// --- Handle Deletion ---
-if (isset($_GET['delete_user_id'])) {
-    $uid = intval($_GET['delete_user_id']);
-    if ($uid != $_SESSION['user_id']) {
-        $stmt = $conn->prepare("DELETE FROM users WHERE user_id=?");
-        $stmt->bind_param("i", $uid);
-        if ($stmt->execute()) {
-            $msg = "✅ User deleted successfully!";
-        } else {
-            $msg = "❌ Error deleting user: " . $conn->error;
-        }
-    } else {
-        $msg = "❌ Cannot delete your own account!";
-    }
-}
-
-// --- Handle Edit ---
-if (isset($_POST['edit_user'])) {
-    $uid = intval($_POST['user_id']);
-    $name = trim($_POST['full_name']);
-    $email = trim($_POST['email']);
-    $role = $_POST['role'];
-
-    $stmt_check = $conn->prepare("SELECT user_id FROM users WHERE email=? AND user_id<>?");
-    $stmt_check->bind_param("si", $email, $uid);
-    $stmt_check->execute();
-    $stmt_check->store_result();
-    if ($stmt_check->num_rows > 0) {
-        $msg = "❌ Email already exists!";
-    } else {
-        $stmt = $conn->prepare("UPDATE users SET full_name=?, email=?, role=? WHERE user_id=?");
-        $stmt->bind_param("sssi", $name, $email, $role, $uid);
-        if ($stmt->execute()) {
-            $msg = "✅ User updated successfully!";
-        } else {
-            $msg = "❌ Error updating user: " . $conn->error;
-        }
-    }
-}
-
-// --- Fetch All Users ---
-$users = $conn->query("SELECT * FROM users ORDER BY user_id ASC");
+$base_path = '/MealMate-online-food-ordering-system';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Admin Dashboard | MealMate</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - MealMate</title>
+    <link rel="stylesheet" href="../assets/form.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-/* General Body */
+/* === Global Styles === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
-    margin:0; padding:0;
-    color:#fff;
-    background:#0d0d0d;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    color: #fff;
+    scroll-behavior: smooth;
+    background-color: #0d0d0d;
+    overflow-x: hidden;
+    position: relative;
 }
 
-/* Header */
-header {
-    position: fixed;
-    top:0; left:0;
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:20px 50px;
-    background: rgba(0,0,0,0.95);
+/* === Navbar Styles === */
+.navbar {
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
     border-bottom: 2px solid #FF4500;
-    z-index:1000;
+    padding: 20px 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-header h1 {
-    font-size:32px;
-    color:#FF4500;
-    margin:0;
-    font-weight:700;
+
+.nav-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo {
+    color: #FF4500;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
     text-shadow: 3px 3px 6px #000;
 }
-header nav a {
-    color:#fff;
-    margin:0 15px;
-    text-decoration:none;
-    font-size:18px;
-    position:relative;
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-menu a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    padding: 0;
+    position: relative;
     transition: color 0.3s ease;
 }
-header nav a::after {
-    content:'';
-    position:absolute;
-    bottom:-5px;
-    left:0;
-    width:0;
-    height:2px;
-    background:#FF4500;
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #FF4500;
     transition: width 0.3s ease;
 }
-header nav a:hover,
-header nav a.active { color:#FF4500; }
-header nav a:hover::after,
-header nav a.active::after { width:100%; }
 
-/* Container */
-.container {
-    flex:1;
-    width:90%;
-    max-width:1200px;
-    margin:130px auto 20px;
+.nav-menu a:hover,
+.nav-menu a.active {
+    color: #FF4500;
+}
+
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+    width: 100%;
+}
+
+/* === Content Styling === */
+.dashboard-container {
+    padding-top: 150px; /* Adjusted to be below the fixed header */
+    text-align: center;
+}
+
+.dashboard-card {
     background: rgba(20,20,20,0.95);
-    padding:25px;
-    border-radius:12px;
-    border:2px solid #FF4500;
-    box-shadow:0 0 20px rgba(255,69,0,0.6);
-    overflow-y:auto;
-    max-height:70vh;
+    padding: 40px;
+    border-radius: 12px;
+    border: 2px solid #FF4500;
+    box-shadow: 0 4px 20px rgba(255,69,0,0.5);
+    width: 600px;
+    max-width: 90%;
+    margin: 50px auto;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-/* Messages */
-.msg { text-align:center; margin-bottom:20px; font-size:15px; color:#ffcc80; }
-
-/* Tabs */
-.tabs { display:flex; border-bottom:2px solid #FF4500; margin-bottom:20px; cursor:pointer; }
-.tab { padding:10px 20px; margin-right:5px; background:#222; border-radius:8px 8px 0 0; color:#fff; font-weight:bold; }
-.tab.active { background:#FF4500; color:#000; }
-.tab-content { display:none; }
-.tab-content.active { display:block; }
-
-/* Table */
-table { width:100%; border-collapse: collapse; margin-top:10px; }
-th, td { padding:12px; text-align:left; border-bottom:1px solid #555; }
-th { background:#FF4500; color:#000; }
-td { background:#2b2b2b; color:#fff; }
-tr:hover td { background:#444; }
-
-/* Inline Form */
-.inline-form { display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
-.inline-form input, .inline-form select { padding:4px 6px; border-radius:4px; background:#333; color:#fff; border:1px solid #FF4500; }
-.inline-form button { background:#ff4500; color:#fff; padding:5px 10px; border:none; border-radius:4px; cursor:pointer; }
-.inline-form button:hover { background:#e63e00; }
-
-/* Delete Button */
-.delete-btn { background:#ff4500; color:#fff; padding:5px 10px; border-radius:4px; text-decoration:none; margin-left:5px; display:inline-block; }
-.delete-btn:hover { background:#e63e00; }
-
-/* Footer */
-footer {
-    text-align:center;
-    padding:25px;
-    background:#000;
-    color:#FF4500;
-    font-size:14px;
-    border-top:2px solid #FF4500;
-    margin-top:auto;
+.dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(255,69,0,0.7);
 }
 
-/* Responsive */
-@media(max-width:768px){
-    header { flex-direction:column; padding:15px 20px; }
-    header h1 { font-size:28px; margin-bottom:10px; }
-    header nav a { margin:5px 10px; font-size:16px; }
-    .container { margin:150px 10px 20px; padding:20px; max-height:65vh; }
+.dashboard-card h2 {
+    color: #fff;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.dashboard-card p {
+    color: #aaa;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.dashboard-card .quick-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.dashboard-card .quick-links a {
+    text-decoration: none;
+    background: #ff4500;
+    color: #000;
+    font-weight: bold;
+    padding: 12px 25px;
+    border-radius: 8px;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.dashboard-card .quick-links a:hover {
+    background: #e65c00;
+    transform: translateY(-2px);
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 20px;
+    }
+    .nav-logo {
+        font-size: 24px;
+    }
+    .nav-menu {
+        gap: 1.5rem;
+    }
+    .nav-menu a {
+        font-size: 16px;
+    }
+    .dashboard-container {
+        padding-top: 120px;
+    }
+    .dashboard-card {
+        padding: 30px;
+    }
+    .dashboard-card h2 {
+        font-size: 2em;
+    }
+    .dashboard-card p {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 10px 1rem;
+    }
+    .nav-logo {
+        font-size: 20px;
+    }
+    .nav-menu {
+        gap: 1rem;
+    }
+    .nav-menu a {
+        font-size: 14px;
+    }
+    .dashboard-card {
+        padding: 20px;
+    }
+    .dashboard-card h2 {
+        font-size: 1.8em;
+    }
+    .dashboard-card p {
+        font-size: 1em;
+    }
+    .dashboard-card .quick-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+/* Footer styles for the copyright text */
+.simple-footer {
+    background-color: #0d0d0d; /* Match the body background */
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    position: relative; /* Allows the orange line to be positioned relative to the footer */
+    width: 100%; /* Make footer span full width */
+    margin: 0;   /* Remove any auto-centering */
+}
+
+/* Orange line above the footer text */
+.simple-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #FF4500; /* The requested orange color */
 }
 </style>
-
-<script>
-function showTab(tabId){
-    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-
-    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-    document.getElementById(tabId+'-btn').classList.add('active');
-}
-window.onload=function(){ showTab('users'); }
-</script>
-
 </head>
 <body>
-
-<header>
-<h1>MealMate</h1>
-<nav>
-<a href="/MealMate-online-food-ordering-system/index.php">Home</a>
-<a href="/MealMate-online-food-ordering-system/users/admin/admin_dashboard.php" class="active">Dashboard</a>
-<a href="/MealMate-online-food-ordering-system/users/logout.php">Logout</a>
-</nav>
-</header>
-
-<div class="container">
-<h2 style="text-align:center;">Admin Dashboard</h2>
-<?php if($msg!="") echo "<div class='msg'>$msg</div>"; ?>
-
-<div class="tabs">
-    <div class="tab active" id="users-btn" onclick="showTab('users')">Users</div>
-    <div class="tab" id="food-btn" onclick="showTab('food')">Food</div>
-    <div class="tab" id="orders-btn" onclick="showTab('orders')">Orders</div>
-    <div class="tab" id="cart-btn" onclick="showTab('cart')">Cart</div>
-</div>
-
-<!-- Users Tab -->
-<div class="tab-content" id="users">
-<?php if($users->num_rows > 0): ?>
-<table>
-<tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr>
-<?php while($user = $users->fetch_assoc()): ?>
-<tr>
-<td><?= $user['user_id'] ?></td>
-<td><?= htmlspecialchars($user['full_name']) ?></td>
-<td><?= htmlspecialchars($user['email']) ?></td>
-<td><?= $user['role'] ?></td>
-<td><?= $user['created_at'] ?></td>
-<td>
-<?php if($user['user_id'] != $_SESSION['user_id']): ?>
-<form method="POST" class="inline-form">
-<input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
-<input type="text" name="full_name" value="<?= htmlspecialchars($user['full_name']) ?>" required>
-<input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
-<select name="role">
-<option value="customer" <?= $user['role']=='customer'?'selected':'' ?>>Customer</option>
-<option value="admin" <?= $user['role']=='admin'?'selected':'' ?>>Admin</option>
-</select>
-<button type="submit" name="edit_user">Update</button>
-</form>
-<a class="delete-btn" href="?delete_user_id=<?= $user['user_id'] ?>" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
-<?php else: ?>
-<span style="color:#ccc;">You</span>
-<?php endif; ?>
-</td>
-</tr>
-<?php endwhile; ?>
-</table>
-<?php else: ?>
-<p style="text-align:center;">No users found.</p>
-<?php endif; ?>
-</div>
-
-<!-- Placeholder Tabs -->
-<div class="tab-content" id="food"><p style="text-align:center;">Food management coming soon.</p></div>
-<div class="tab-content" id="orders"><p style="text-align:center;">Orders management coming soon.</p></div>
-<div class="tab-content" id="cart"><p style="text-align:center;">Cart management coming soon.</p></div>
-
-</div>
-
-<footer>
-<p>&copy; <?= date("Y") ?> MealMate. All rights reserved.</p>
-</footer>
-
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">MealMate</h1>
+            <ul class="nav-menu">
+                <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
+                <li><a href="admin_dashboard.php" class="active">Dashboard</a></li>
+                <li><a href="manage_food.php">Manage Food</a></li>
+                <li><a href="manage_users.php">Manage Users</a></li>
+                <li><a href="../logout.php">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <h2>Welcome, Admin <?= htmlspecialchars($_SESSION['full_name']) ?>!</h2>
+            <p>This is your administrative control panel.</p>
+            <div class="quick-links">
+                <a href="manage_food.php">Manage Food</a>
+                <a href="manage_users.php">Manage Users</a>
+            </div>
+        </div>
+    </div>
+    <div class="simple-footer">
+        &copy; 2025 MealMate. All rights reserved.
+    </div>
 </body>
 </html>
