@@ -39,6 +39,8 @@ if ($result && $result->num_rows > 0) {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
         /* Navbar */
@@ -154,6 +156,33 @@ if ($result && $result->num_rows > 0) {
             margin-left: calc(-50vw + 50%);
         }
 
+        /* Search bar */
+        .search-container {
+            margin-bottom: 0;
+            padding: 8px 10px;
+            background: rgba(20,20,20,0.95);
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            border-bottom: 2px solid #FF4500;
+        }
+
+        .search-container input {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #FF4500;
+            width: 250px;
+            background: #111;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #ff4500;
+            box-shadow: 0 0 10px #ff4500;
+        }
+
         /* User table */
         .user-table-container {
             overflow-x: auto;
@@ -187,7 +216,7 @@ if ($result && $result->num_rows > 0) {
             text-transform: uppercase;
             font-size: 13px;
             position: sticky;
-            top: 0;
+            top: 38px; /* below search bar */
             z-index: 2;
         }
 
@@ -288,7 +317,7 @@ if ($result && $result->num_rows > 0) {
         /* Footer */
         footer {
             background: #111;
-            color: #888;
+            color: #ff4500;
             text-align: center;
             padding: 15px 10px;
             font-size: 14px;
@@ -313,12 +342,15 @@ if ($result && $result->num_rows > 0) {
 
     <div class="container">
         <div class="header">
-            <h2>Manage Users</h2>
+            <h2>Manage Users</h2> 
             <p>View, update, or delete registered users.</p>
         </div>
 
         <div class="user-table-container">
-            <table class="user-table">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search users...">
+            </div>
+            <table class="user-table" id="userTable">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -369,23 +401,42 @@ if ($result && $result->num_rows > 0) {
     <?php include '../../includes/simple_footer.php'; ?>
 
     <script>
+        // Delete modal
         let userIdToDelete = null;
-
         function showDeleteModal(userId) {
             userIdToDelete = userId;
             document.getElementById('deleteModal').style.display = 'flex';
         }
-
         function hideDeleteModal() {
             userIdToDelete = null;
             document.getElementById('deleteModal').style.display = 'none';
         }
-
         function confirmDelete() {
             if (userIdToDelete !== null) {
                 window.location.href = 'delete_user.php?id=' + userIdToDelete;
             }
         }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const userTable = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+
+        searchInput.addEventListener('keyup', function() {
+            const filter = searchInput.value.toLowerCase();
+            const rows = userTable.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let match = false;
+                for (let j = 0; j < cells.length - 1; j++) { // ignore Actions column
+                    if (cells[j].textContent.toLowerCase().indexOf(filter) > -1) {
+                        match = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = match ? '' : 'none';
+            }
+        });
     </script>
 </body>
 </html>
