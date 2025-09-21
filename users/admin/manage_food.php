@@ -3,19 +3,31 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Only include the database connection, not the external header file.
+// Ensure the database connection file exists and is accessible.
+// This path is relative to the current file's location.
 require_once __DIR__ . '/../../includes/db_connect.php';
 
-// Check if user is logged in and has admin role
+// Check if user is logged in and has admin role.
+// This is a crucial security check to prevent unauthorized access.
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../users/login.php");
     exit();
 }
 
-// Dynamically determine the base path for a flexible solution
-$base_path = str_replace('/admin', '', dirname($_SERVER['PHP_SELF']));
+$message = '';
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] == 'deleted') {
+        $message = '<div class="alert success-alert">Food item deleted successfully!</div>';
+    } elseif ($_GET['msg'] == 'not_found') {
+        $message = '<div class="alert error-alert">Error: Food item not found.</div>';
+    } elseif ($_GET['msg'] == 'error') {
+        $message = '<div class="alert error-alert">Error deleting food item. Please try again.</div>';
+    }
+}
 
-// Fetch all food items from the database
+
+// Fetch all food items from the database.
+// The ORDER BY clause ensures the newest items are at the top.
 $food_items = [];
 $sql = "SELECT * FROM foods ORDER BY id DESC";
 $result = $conn->query($sql);
@@ -27,7 +39,7 @@ if ($result && $result->num_rows > 0) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Manage Food - MealMate Admin</title>
@@ -265,6 +277,33 @@ body {
 .food-table .actions .delete-btn:hover {
     color: #F44336; /* Red */
 }
+/* Alert Message Styles */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    animation: fadeInOut 5s forwards;
+}
+
+.alert.success-alert {
+    background-color: #28a745; /* Darker green */
+    color: #fff;
+}
+
+.alert.error-alert {
+    background-color: #dc3545; /* Darker red */
+    color: #fff;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
 
 /* === Responsive Design === */
 @media (max-width: 768px) {
@@ -374,6 +413,31 @@ html body.manage-food {
     background-image: none !important;
     background-color: #0d0d0d !important;
 }
+
+/* === Footer Styles === */
+/* Footer styles for the copyright text */
+.simple-footer {
+    background-color: #0d0d0d;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    position: relative;
+    width: 100%;
+    margin: 0;
+}
+
+/* Orange line above the footer text */
+.simple-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #FF4500;
+}
 </style>
 </head>
 
@@ -384,7 +448,8 @@ html body.manage-food {
             <ul class="nav-menu">
                 <li><a href="/MealMate-online-food-ordering-system/index.php">Home</a></li>
                 <li><a href="admin_dashboard.php">Dashboard</a></li>
-                <li><a href="manage_food.php" class="active">Manage Food</a></li>
+                <li><a href="/MealMate-online-food-ordering-system/food_management/manage_food.php" class="active">Manage Food</a></li>
+                <li><a href="/MealMate-online-food-ordering-system/order_management/manage_orders.php">Manage Orders</a></li>
                 <li><a href="manage_users.php">Manage Users</a></li>
                 <li><a href="/MealMate-online-food-ordering-system/users/logout.php">Logout</a></li>
             </ul>
@@ -395,7 +460,10 @@ html body.manage-food {
             <h2>Manage Food Items</h2>
             <p>Add, edit, or delete food items from your menu.</p>
         </div>
-        <a href="add_food.php" class="add-food-btn">Add New Food Item</a>
+        
+        <?php echo $message; ?>
+        
+        <a href="/MealMate-online-food-ordering-system/food_management/add_food.php" class="add-food-btn">Add New Food Item</a>
         <div class="food-table-container">
             <table class="food-table">
                 <thead>
@@ -425,7 +493,7 @@ html body.manage-food {
                             // Construct web path (for <img src>)
                             $web_path = '/MealMate-online-food-ordering-system/assets/images/menu/' . $image_folder . '/' . $item['image'];
                             
-                            // If file doesn’t exist or is empty → fallback
+                            // If file doesn’t exist or is empty, use a fallback placeholder image
                             if (empty($item['image']) || !is_file($server_path)) {
                                 $web_path = 'https://placehold.co/70x70/0d0d0d/FFFFFF?text=No+Image';
                             }
@@ -437,7 +505,8 @@ html body.manage-food {
                             <td><?= htmlspecialchars(number_format($item['price'], 2)) ?></td>
                             <td><?= htmlspecialchars($item['category']) ?></td>
                             <td class="actions">
-                                <a href="edit_food.php?id=<?= $item['id'] ?>" class="edit-btn"><i class="fas fa-edit"></i></a>
+                                <!-- FIX: Corrected the href URL to pass the ID as a query parameter -->
+                                <a href="/MealMate-online-food-ordering-system/food_management/edit_food.php?id=<?= $item['id'] ?>" class="edit-btn"><i class="fas fa-edit"></i></a>
                                 <a href="#" class="delete-btn" onclick="showDeleteModal(<?= $item['id'] ?>); return false;">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
@@ -464,7 +533,9 @@ html body.manage-food {
         </div>
     </div>
 
-    <?php include '../../includes/simple_footer.php'; ?>
+    <div class="simple-footer">
+        &copy; <?= date('Y') ?> MealMate. All rights reserved.
+    </div>
 
     <script>
         let foodIdToDelete = null;
@@ -481,7 +552,8 @@ html body.manage-food {
 
         function confirmDelete() {
             if (foodIdToDelete !== null) {
-                window.location.href = 'delete_food.php?id=' + foodIdToDelete;
+                // FIX: Corrected the URL here to pass the ID as a query parameter
+                window.location.href = '/MealMate-online-food-ordering-system/food_management/delete_food.php?id=' + foodIdToDelete;
             }
         }
     </script>

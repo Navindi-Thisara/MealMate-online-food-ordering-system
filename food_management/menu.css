@@ -90,18 +90,20 @@ body {
 }
 
 /* === Main Content Container === */
+/* Updated to span full width on all screen sizes */
 .container {
     width: 100%;
-    max-width: 1400px;
-    margin: 120px auto 2rem auto;
-    padding: 0 50px;
+    max-width: 100%;
+    margin: 120px 0 2rem 0;
+    padding: 0;
 }
 
 /* === Header Section === */
 .header {
+    max-width: 1400px;
+    margin: 0 auto 2rem auto;
+    padding: 0 50px;
     text-align: center;
-    margin-bottom: 2rem;
-    padding: 0.5rem 0;
     position: relative;
 }
 
@@ -155,10 +157,12 @@ body {
 
 /* === Menu Grid === */
 .menu-grid {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
-    padding: 0;
     margin-top: 1rem;
 }
 
@@ -202,18 +206,18 @@ body {
 .menu-item p {
     color: #cccccc;
     line-height: 1.4;
-    height: 50px; /* Initial fixed height for consistent alignment */
+    height: 50px;
     overflow: hidden;
-    text-overflow: ellipsis; /* Shows "..." if text exceeds initial height */
+    text-overflow: ellipsis;
     margin-bottom: 1rem;
-    transition: height 0.3s ease-in-out; /* Smooth transition for expansion */
+    transition: height 0.3s ease-in-out;
 }
 
 .menu-item:hover p {
-    height: auto; /* Expand height on hover */
-    max-height: 100px; /* Prevents descriptions from being excessively long */
-    overflow: auto; /* Allows scrolling if still too long */
-    text-overflow: clip; /* Removes ellipsis on hover */
+    height: auto;
+    max-height: 100px;
+    overflow: auto;
+    text-overflow: clip;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -223,8 +227,8 @@ body {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .menu-item:hover p {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 
@@ -265,9 +269,10 @@ body {
         padding: 15px 20px;
     }
 
+    /* Remove padding to allow full-width on mobile */
     .container {
-        margin: 100px auto 1.5rem auto;
-        padding: 0 20px;
+        margin: 100px 0 1.5rem 0;
+        padding: 0;
     }
 
     .header {

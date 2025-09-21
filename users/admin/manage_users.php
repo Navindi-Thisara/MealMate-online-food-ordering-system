@@ -3,14 +3,17 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Database connection
-require_once __DIR__ . '/../../includes/db_connect.php';
+// Corrected include path to go up two directories
+include '../../includes/db_connect.php';
 
-// Restrict to admin only
+// Check if user is logged in and has admin role
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../users/login.php");
     exit();
 }
+
+// Define the base path for consistent navigation
+$base_path = '/MealMate-online-food-ordering-system';
 
 // Fetch all users
 $users = [];
@@ -31,30 +34,38 @@ if ($result && $result->num_rows > 0) {
     <link rel="stylesheet" href="../assets/form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body.manage-users {
+        /* === Global & Navbar Styles from admin_dashboard.php === */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        * {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #000;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
             color: #fff;
+            scroll-behavior: smooth;
+            background-color: #0d0d0d;
+            overflow-x: hidden;
+            position: relative;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            scroll-behavior: smooth;
-            overflow-x: hidden;
         }
 
-        /* Navbar */
         .navbar {
             background-color: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
             border-bottom: 2px solid #FF4500;
             padding: 20px 50px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 20;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            z-index: 20;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -90,6 +101,7 @@ if ($result && $result->num_rows > 0) {
             font-size: 18px;
             font-weight: 400;
             letter-spacing: 0.5px;
+            padding: 0;
             position: relative;
             transition: color 0.3s ease;
         }
@@ -115,16 +127,15 @@ if ($result && $result->num_rows > 0) {
             width: 100%;
         }
 
-        /* Main container */
+        /* === Page Specific Styles (Adapted from original code) === */
         .container {
             width: 100%;
             max-width: 1400px;
-            margin: 120px auto 0 auto;
+            margin: 120px auto 20px auto;
             padding: 0 50px;
             flex: 1 0 auto;
         }
 
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 2rem;
@@ -141,7 +152,8 @@ if ($result && $result->num_rows > 0) {
         .header p {
             color: #ccc;
             font-size: 1.1rem;
-            margin-bottom: 1rem;
+            /* Adjusted for a larger gap */
+            margin-bottom: 2rem;
         }
 
         .header::after {
@@ -156,15 +168,14 @@ if ($result && $result->num_rows > 0) {
             margin-left: calc(-50vw + 50%);
         }
 
-        /* Search bar */
         .search-container {
-            margin-bottom: 0;
             padding: 8px 10px;
             background: rgba(20,20,20,0.95);
             position: sticky;
-            top: 0;
-            z-index: 3;
+            top: 72px; /* Adjusted to be below the navbar */
+            z-index: 10; /* Set z-index to make sure it's on top */
             border-bottom: 2px solid #FF4500;
+            border-top: 2px solid #FF4500;
         }
 
         .search-container input {
@@ -183,16 +194,15 @@ if ($result && $result->num_rows > 0) {
             box-shadow: 0 0 10px #ff4500;
         }
 
-        /* User table */
+        /* Removed max-height and overflow-y from this container to allow the body to scroll */
         .user-table-container {
-            overflow-x: auto;
-            overflow-y: auto;
-            max-height: 60vh;
             background: rgba(20, 20, 20, 0.95);
             border-radius: 12px;
             border: 2px solid #FF4500;
             box-shadow: 0 4px 20px rgba(255, 69, 0, 0.5);
-            margin-bottom: 20px;
+            /* Increased margin for the gap as requested */
+            margin-top: 40px; 
+            margin-bottom: 40px;
         }
 
         .user-table {
@@ -216,8 +226,9 @@ if ($result && $result->num_rows > 0) {
             text-transform: uppercase;
             font-size: 13px;
             position: sticky;
-            top: 38px; /* below search bar */
-            z-index: 2;
+            /* New sticky position to sit below the search bar. */
+            top: 116px;
+            z-index: 9;
         }
 
         .user-table tr:nth-child(even) {
@@ -249,7 +260,6 @@ if ($result && $result->num_rows > 0) {
             color: #F44336;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -313,16 +323,28 @@ if ($result && $result->num_rows > 0) {
         .modal-buttons .cancel:hover {
             background-color: #777;
         }
-
-        /* Footer */
-        footer {
-            background: #111;
-            color: #ff4500;
+        
+        /* === Footer styles for the copyright text === */
+        .simple-footer {
+            background-color: #0d0d0d;
+            color: #fff;
+            padding: 10px 0;
             text-align: center;
-            padding: 15px 10px;
+            font-family: 'Poppins', sans-serif;
             font-size: 14px;
-            border-top: 2px solid #ff4500;
-            flex-shrink: 0;
+            position: relative;
+            width: 100%;
+            margin-top: auto;
+        }
+        
+        .simple-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #FF4500;
         }
     </style>
 </head>
@@ -331,11 +353,12 @@ if ($result && $result->num_rows > 0) {
         <div class="nav-container">
             <h1 class="nav-logo">MealMate</h1>
             <ul class="nav-menu">
-                <li><a href="/MealMate-online-food-ordering-system/index.php">Home</a></li>
+                <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
                 <li><a href="admin_dashboard.php">Dashboard</a></li>
                 <li><a href="manage_food.php">Manage Food</a></li>
+                <li><a href="manage_orders.php">Manage Orders</a></li>
                 <li><a href="manage_users.php" class="active">Manage Users</a></li>
-                <li><a href="/MealMate-online-food-ordering-system/users/logout.php">Logout</a></li>
+                <li><a href="<?php echo $base_path; ?>/users/logout.php">Logout</a></li>
             </ul>
         </div>
     </nav>
@@ -398,7 +421,9 @@ if ($result && $result->num_rows > 0) {
         </div>
     </div>
 
-    <?php include '../../includes/simple_footer.php'; ?>
+    <div class="simple-footer">
+        &copy; 2025 MealMate. All rights reserved.
+    </div>
 
     <script>
         // Delete modal

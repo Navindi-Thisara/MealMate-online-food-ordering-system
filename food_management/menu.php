@@ -43,7 +43,7 @@ require_once '../includes/db_connect.php';
                                CASE category
                                    WHEN 'Burgers and Sandwiches' THEN 1
                                    WHEN 'Pizzas' THEN 2
-                                   WHEN 'Pasta' THEN 3
+                                   WHEN 'Pastas' THEN 3
                                    WHEN 'Appetizers' THEN 4
                                    WHEN 'Desserts' THEN 5
                                    ELSE 6

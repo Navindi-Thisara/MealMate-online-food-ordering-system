@@ -1,4 +1,4 @@
-// Sidebar toggle  
+// Sidebar toggle  
 const sideNav = document.getElementById('sideNav');
 const menuBtn = document.getElementById('menuBtn');
 

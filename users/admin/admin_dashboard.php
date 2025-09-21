@@ -1,6 +1,12 @@
 <?php
+// === START: Error Reporting for debugging ===
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+// === END: Error Reporting for debugging ===
+
 if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+session_start();
 }
 // Corrected include path to go up two directories
 include '../../includes/db_connect.php';
@@ -37,10 +43,9 @@ body {
     background-color: #0d0d0d;
     overflow-x: hidden;
     position: relative;
-
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Full viewport height */
+    min-height: 100vh;
 }
 
 /* === Navbar Styles === */
@@ -117,10 +122,13 @@ body {
 }
 
 /* === Content Styling === */
+.main-content {
+    flex: 1;
+}
+
 .dashboard-container {
     padding-top: 150px; /* Adjusted to be below the fixed header */
     text-align: center;
-    flex: 1; /* Pushes footer down */
 }
 
 .dashboard-card {
@@ -230,17 +238,17 @@ body {
     }
 }
 
-/* === Footer Styles === */
+/* Footer styles for the copyright text */
 .simple-footer {
-    background-color: #0d0d0d; /* Match the body background */
+    background-color: #0d0d0d;
     color: #fff;
-    padding: 20px 0;
+    padding: 10px 0; /* Reduced padding for a slimmer footer */
     text-align: center;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
-    width: 100%;
     position: relative;
-    margin-top: auto; /* Keeps footer at bottom */
+    width: 100%;
+    margin-top: auto; /* Pushes the footer to the bottom */
 }
 
 /* Orange line above the footer text */
@@ -256,25 +264,29 @@ body {
 </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <h1 class="nav-logo">MealMate</h1>
-            <ul class="nav-menu">
-                <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
-                <li><a href="admin_dashboard.php" class="active">Dashboard</a></li>
-                <li><a href="manage_food.php">Manage Food</a></li>
-                <li><a href="manage_users.php">Manage Users</a></li>
-                <li><a href="../logout.php">Logout</a></li>
-            </ul>
-        </div>
-    </nav>
-    <div class="dashboard-container">
-        <div class="dashboard-card">
-            <h2>Welcome, Admin <?= htmlspecialchars($_SESSION['full_name']) ?>!</h2>
-            <p>This is your administrative control panel.</p>
-            <div class="quick-links">
-                <a href="manage_food.php">Manage Food</a>
-                <a href="manage_users.php">Manage Users</a>
+    <div class="main-content">
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="nav-logo">MealMate</h1>
+                <ul class="nav-menu">
+                    <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
+                    <li><a href="admin_dashboard.php" class="active">Dashboard</a></li>
+                    <li><a href="manage_food.php">Manage Food</a></li>
+                    <li><a href="manage_users.php">Manage Users</a></li>
+                    <li><a href="manage_orders.php">Manage Orders</a></li>
+                    <li><a href="../logout.php">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="dashboard-container">
+            <div class="dashboard-card">
+                <h2>Welcome, Admin <?= htmlspecialchars($_SESSION['full_name']) ?>!</h2>
+                <p>This is your administrative control panel.</p>
+                <div class="quick-links">
+                    <a href="manage_food.php">Manage Food</a>
+                    <a href="manage_users.php">Manage Users</a>
+                    <a href="manage_orders.php">Manage Orders</a>
+                </div>
             </div>
         </div>
     </div>
