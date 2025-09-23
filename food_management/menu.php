@@ -3,36 +3,63 @@ session_start();
 
 include '../includes/menu_header.php';
 require_once '../includes/db_connect.php';
+require_once '../cart/cart_controller.php';
+
+// Fetch cart items for initial page load if the user is logged in
+$cart_items = [];
+$cart_total = 0;
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $cart_items = getCartItems($conn, $user_id);
+    $cart_total = calculateCartTotal($conn, $user_id);
+}
 ?>
 
-<style>
-/* === Custom Alert Box Styles === */
-.custom-alert {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #28a745;
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    text-align: center;
-    transition: opacity 0.5s ease-in-out;
-    opacity: 1;
-}
-.custom-alert.error {
-    background-color: #dc3545;
-}
-</style>
+<!-- Include CSS -->
+<link rel="stylesheet" href="menu.css">
+
+<!-- Beautiful Confirmation Modal -->
+<div class="confirmation-modal" id="confirmationModal">
+    <div class="confirmation-content">
+        <button class="close-confirm-btn" onclick="hideConfirmationModal()">&times;</button>
+        <div class="confirmation-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="confirmation-title">Remove Item</h3>
+        <p class="confirmation-message" id="confirmationMessage">Are you sure you want to remove this item from your cart?</p>
+        <div class="confirmation-buttons">
+            <button class="confirm-btn" id="confirmRemove">Yes, Remove</button>
+            <button class="cancel-btn" id="cancelRemove">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="sliding-cart-overlay" onclick="toggleCart()"></div>
+
+<div id="sliding-cart">
+    <div class="cart-header">
+        <h2>Your Cart</h2>
+        <button class="close-cart-btn" onclick="toggleCart()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div id="cart-items-container">
+        <p class="empty-cart-message">Your cart is empty.</p>
+    </div>
+    <div class="cart-total-section">
+        <span>Total:</span>
+        <span class="total-price" id="cart-total-price">Rs.0.00</span>
+    </div>
+    <a href="../cart/checkout.php" class="btn-checkout">Proceed to Checkout</a>
+</div>
 
 <div class="container">
     <div class="header">
         <h2>🍕 Food Menu</h2>
         <p>Discover our delicious offerings</p>
+        <div class="cart-icon" id="main-cart-icon" onclick="toggleCart()">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
     </div>
 
     <?php
@@ -54,7 +81,6 @@ require_once '../includes/db_connect.php';
             while ($category_row = $result_categories->fetch_assoc()) {
                 $category_name = $category_row['category'];
 
-                // Display category heading
                 echo '<h2 class="category-title">' . htmlspecialchars($category_name) . '</h2>';
                 echo '<div class="menu-grid">';
 
@@ -82,8 +108,8 @@ require_once '../includes/db_connect.php';
                         <div class="menu-item">
                             <div class="food-image">
                                 <img src="' . htmlspecialchars($image_path) . '" 
-                                     alt="' . htmlspecialchars($food_row["name"]) . '"
-                                     onerror="this.src=\'../assets/images/menu/default.jpg\';">
+                                    alt="' . htmlspecialchars($food_row["name"]) . '"
+                                    onerror="this.src=\'../assets/images/menu/default.jpg\';">
                             </div>
                             <h3>' . htmlspecialchars($food_row["name"]) . '</h3>
                             <p>' . htmlspecialchars($food_row["description"]) . '</p>
@@ -94,7 +120,7 @@ require_once '../includes/db_connect.php';
                         </div>';
                     }
                 }
-                echo '</div>'; // close .menu-grid
+                echo '</div>';
             }
         } else {
             echo '<p>No food items are currently available.</p>';
@@ -105,38 +131,8 @@ require_once '../includes/db_connect.php';
     ?>
 </div>
 
-<script>
-function showAlert(message, isError = false) {
-    const alertBox = document.createElement('div');
-    alertBox.textContent = message;
-    alertBox.classList.add('custom-alert');
-    if (isError) {
-        alertBox.classList.add('error');
-    }
-    document.body.appendChild(alertBox);
-
-    // Fade out and remove
-    setTimeout(() => {
-        alertBox.style.opacity = '0';
-        setTimeout(() => alertBox.remove(), 500);
-    }, 2000);
-}
-
-function addToCart(foodId) {
-    fetch('food_controller.php?action=add_to_cart&food_id=' + foodId)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert('Added to cart successfully!');
-            } else {
-                showAlert('Error: ' + data.message, true);
-            }
-        })
-        .catch(() => {
-            showAlert('Error: Failed to connect to server.', true);
-        });
-}
-</script>
+<!-- Include JavaScript -->
+<script src="menu.js"></script>
 
 <?php
 include '../includes/footer.php';
