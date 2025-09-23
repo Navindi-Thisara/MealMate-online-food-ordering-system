@@ -22,8 +22,15 @@ $cart_active = ($current_page == 'cart.php' || $current_page == 'checkout.php') 
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <h1 class="nav-logo">MealMate</h1>
-            <ul class="nav-menu">
+            <div class="nav-header">
+                <h1 class="nav-logo">MealMate</h1>
+                <div class="nav-toggle" id="navToggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+            <ul class="nav-menu" id="navMenu">
                 <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
                 <li><a href="<?php echo $base_path; ?>/food_management/menu.php" class="<?php echo $menu_active; ?>">Menu</a></li>
                 <li><a href="<?php echo $base_path; ?>/cart/cart.php" class="<?php echo $cart_active; ?>">Cart</a></li>
@@ -37,3 +44,35 @@ $cart_active = ($current_page == 'cart.php' || $current_page == 'checkout.php') 
             </ul>
         </div>
     </nav>
+
+    <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+            
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('nav-menu-active');
+                    navToggle.classList.toggle('toggle-active');
+                });
+                
+                // Close menu when clicking on a link
+                const navLinks = navMenu.querySelectorAll('a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navMenu.classList.remove('nav-menu-active');
+                        navToggle.classList.remove('toggle-active');
+                    });
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!navToggle.contains(event.target) && !navMenu.contains(event.target)) {
+                        navMenu.classList.remove('nav-menu-active');
+                        navToggle.classList.remove('toggle-active');
+                    }
+                });
+            }
+        });
+    </script>

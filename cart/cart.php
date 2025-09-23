@@ -110,7 +110,7 @@ include '../includes/menu_header.php';
                     </div>
                     
                     <div class="checkout-actions">
-                        <a href="checkout.php" class="btn-primary">
+                        <a href="../orders/checkout.php" class="btn-primary">
                             <i class="fas fa-credit-card" style="margin-right: 0.5rem;"></i>
                             Proceed to Checkout
                         </a>

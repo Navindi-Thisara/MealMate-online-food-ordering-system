@@ -3,7 +3,7 @@ session_start();
 // Include the necessary files
 require_once __DIR__ . '/../includes/menu_header.php';
 require_once __DIR__ . '/../includes/db_connect.php';
-require_once 'cart_controller.php';
+require_once __DIR__ . '/../cart/cart_controller.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -488,7 +488,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php else: ?>
                 <div class="checkout-container">
-                    <!-- Order Summary Section -->
                     <div class="order-summary-section">
                         <h2 class="section-title">Order Summary</h2>
                         
@@ -527,7 +526,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                     
-                    <!-- Order Details Section -->
                     <div class="order-details-section">
                         <?php if (isset($_SESSION['order_success']) && isset($_SESSION['order_details'])): ?>
                             <h2 class="section-title">Order Confirmed!</h2>

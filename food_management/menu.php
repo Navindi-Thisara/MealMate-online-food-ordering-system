@@ -50,7 +50,7 @@ if (isset($_SESSION['user_id'])) {
         <span>Total:</span>
         <span class="total-price" id="cart-total-price">Rs.0.00</span>
     </div>
-    <a href="../cart/checkout.php" class="btn-checkout">Proceed to Checkout</a>
+    <a href="../orders/checkout.php" class="btn-checkout">Proceed to Checkout</a>
 </div>
 
 <div class="container">
