@@ -742,3 +742,83 @@ body {
         font-size: 1rem;
     }
 }
+
+/* --- Sliding Cart Drawer (menu.php) --- */
+.sliding-cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none; /* hidden by default */
+    z-index: 999;
+}
+
+#sliding-cart {
+    position: fixed;
+    top: 0;
+    right: -400px; /* keep hidden offscreen */
+    width: 350px;
+    height: 100%;
+    background: #111;
+    border-left: 2px solid #FF4500;
+    box-shadow: -2px 0 12px rgba(0,0,0,0.5);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+#sliding-cart.active {
+    right: 0; /* slide in when active */
+}
+
+#sliding-cart .cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 2px solid rgba(255, 69, 0, 0.3);
+}
+
+#sliding-cart .cart-header h2 {
+    color: #FF4500;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+#sliding-cart .close-cart-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+#sliding-cart .cart-total-section {
+    margin-top: auto;
+    padding: 1rem;
+    border-top: 2px solid rgba(255, 69, 0, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+#sliding-cart .btn-checkout {
+    margin: 1rem;
+    padding: 0.8rem;
+    text-align: center;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #FF4500, #FF6B35);
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+#sliding-cart .btn-checkout:hover {
+    background: linear-gradient(135deg, #e63e00, #FF5A29);
+}
