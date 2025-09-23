@@ -13,16 +13,32 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE foods ( id INT AUTO_INCREMENT PRIMARY KEY,
- name VARCHAR(100) NOT NULL, 
- description TEXT, 
- price DECIMAL(10,2) NOT NULL, 
- category VARCHAR(50), 
- image VARCHAR(100) DEFAULT 'default.jpg', 
- available TINYINT(1) DEFAULT 1, 
- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP );
+CREATE TABLE foods (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    category VARCHAR(50),
+    image VARCHAR(100) DEFAULT 'default.jpg',
+    available TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
- -- Burgers and Sandwiches
+CREATE TABLE IF NOT EXISTS `cart` (
+  `cart_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `food_id` INT(11) NOT NULL,
+  `quantity` INT(11) NOT NULL DEFAULT '1',
+  `added_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cart_id`),
+  UNIQUE KEY `unique_user_food` (`user_id`, `food_id`),
+  KEY `food_id` (`food_id`),
+  CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`food_id`) REFERENCES `foods` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- Burgers and Sandwiches
 INSERT INTO foods (name, description, price, category, image) VALUES
 ('Classic Cheeseburger', 'A juicy beef patty with melted cheese, lettuce, tomato, and onion.', 800.00, 'Burgers and Sandwiches', 'classic-cheeseburger.jpg'),
 ('BBQ Bacon Burger', 'A savory beef patty topped with crispy bacon and tangy BBQ sauce.', 950.00, 'Burgers and Sandwiches', 'bbq-bacon-burger.jpg'),
