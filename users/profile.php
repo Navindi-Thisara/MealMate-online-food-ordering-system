@@ -277,7 +277,7 @@ body {
                     <li><a href="logout.php">Logout</a></li>
                 <?php else: ?>
                     <!-- User Navigation -->
-                    <li><a href="<?php echo $base_path; ?>/menu.php">Menu</a></li>
+                    <li><a href="<?php echo $base_path; ?>/food_management/menu.php">Menu</a></li>
                     <li><a href="<?php echo $base_path; ?>/cart/cart.php">Cart</a></li>
                     <li><a href="profile.php" class="active">Profile</a></li>
                     <li><a href="logout.php">Logout</a></li>
