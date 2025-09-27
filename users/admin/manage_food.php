@@ -449,7 +449,7 @@ html body.manage-food {
                 <li><a href="/MealMate-online-food-ordering-system/index.php">Home</a></li>
                 <li><a href="admin_dashboard.php">Dashboard</a></li>
                 <li><a href="/MealMate-online-food-ordering-system/food_management/manage_food.php" class="active">Manage Food</a></li>
-                <li><a href="/MealMate-online-food-ordering-system/order_management/manage_orders.php">Manage Orders</a></li>
+                <li><a href="/MealMate-online-food-ordering-system/users/admin/orders/admin_orders.php">Manage Orders</a></li>
                 <li><a href="manage_users.php">Manage Users</a></li>
                 <li><a href="/MealMate-online-food-ordering-system/users/logout.php">Logout</a></li>
             </ul>

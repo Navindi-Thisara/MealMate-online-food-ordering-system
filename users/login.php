@@ -27,6 +27,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // Choose redirect page by role
                 if ($user['role'] === 'admin') {
+                    // Fix applied here
+                    $_SESSION['is_admin'] = true;
+                    $_SESSION['admin_id'] = $user['user_id'];
                     $msg = "✅ Login successful! Redirecting to Admin Dashboard...";
                     $redirectUrl = "../users/admin/admin_dashboard.php";
                 } else {
@@ -50,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $msg = "❌ Email not registered!";
         }
     } else {
-        $msg = "⚠️ Please fill all fields!";
+        $msg = "⚠ Please fill all fields!";
     }
 }
 ?>
@@ -98,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         
         .simple-footer::before {
-            content:'';
+            content:''; 
             position:absolute;
             top:0;
             left:0;
@@ -148,6 +151,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
         }
 
+        /* Forgot password link */
+        .forgot-password {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .forgot-password a {
+            color: #FF4500;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* Login link */
+        .login-link {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .msg {
+            margin-bottom: 15px;
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -184,6 +212,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <button type="submit">Login</button>
+
+                    <p class="forgot-password">
+                        <a href="forgot_password.php">Forgot Password?</a>
+                    </p>
                 </form>
 
                 <p class="login-link">

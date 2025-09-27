@@ -356,7 +356,7 @@ if ($result && $result->num_rows > 0) {
                 <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
                 <li><a href="admin_dashboard.php">Dashboard</a></li>
                 <li><a href="manage_food.php">Manage Food</a></li>
-                <li><a href="manage_orders.php">Manage Orders</a></li>
+                <li><a href="orders/admin_orders.php">Manage Orders</a></li>
                 <li><a href="manage_users.php" class="active">Manage Users</a></li>
                 <li><a href="<?php echo $base_path; ?>/users/logout.php">Logout</a></li>
             </ul>
