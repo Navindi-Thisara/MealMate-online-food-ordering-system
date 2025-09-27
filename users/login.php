@@ -27,6 +27,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // Choose redirect page by role
                 if ($user['role'] === 'admin') {
+                    // Fix applied here
+                    $_SESSION['is_admin'] = true;
+                    $_SESSION['admin_id'] = $user['user_id'];
                     $msg = "✅ Login successful! Redirecting to Admin Dashboard...";
                     $redirectUrl = "../users/admin/admin_dashboard.php";
                 } else {
@@ -50,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $msg = "❌ Email not registered!";
         }
     } else {
-        $msg = "⚠️ Please fill all fields!";
+        $msg = "⚠ Please fill all fields!";
     }
 }
 ?>
