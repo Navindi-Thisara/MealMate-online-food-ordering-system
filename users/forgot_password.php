@@ -1,6 +1,10 @@
 <?php
 session_start();
 require_once('../includes/db_connect.php');
+require '../vendor/autoload.php'; // PHPMailer autoload
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 $msg = "";
 
@@ -19,18 +23,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Generate a secure token
             $token = bin2hex(random_bytes(50));
 
-            // Store token in DB (ensure column `reset_token` exists in users table)
+            // Store token in DB (ensure column `reset_token` exists)
             $stmt2 = $conn->prepare("UPDATE users SET reset_token=? WHERE email=?");
             $stmt2->bind_param("ss", $token, $email);
             $stmt2->execute();
 
-            // Reset link (update domain accordingly)
-            $resetLink = "http://yourdomain.com/users/reset_password.php?token=$token";
+            // Reset link (update to your localhost or domain)
+            $resetLink = "http://localhost/MealMate-online-food-ordering-system/users/reset_password.php?token=$token";
 
-            // Send email (replace with PHPMailer if needed)
-            mail($email, "Password Reset Request", "Click the link to reset your password: $resetLink");
+            // Send email using PHPMailer + Mailtrap
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'sandbox.smtp.mailtrap.io';
+                $mail->SMTPAuth   = true;
+                $mail->Port       = 2525;
+                $mail->Username   = 'fead2ad7782a4b'; // Your Mailtrap username
+                $mail->Password   = '159e7fe69f8d04'; // Your Mailtrap password
 
-            $msg = "✅ Password reset link has been sent to your email.";
+                $mail->setFrom('no-reply@mealmate.com', 'MealMate');
+                $mail->addAddress($email, $user['full_name']);
+
+                $mail->isHTML(true);
+                $mail->Subject = 'Password Reset Request';
+                $mail->Body    = "
+                    <h3>Password Reset Request</h3>
+                    <p>Hello {$user['full_name']},</p>
+                    <p>We received a request to reset your password.</p>
+                    <p>Click the link below to reset it:</p>
+                    <p><a href='$resetLink'>$resetLink</a></p>
+                    <br>
+                    <p><strong>Password Requirements:</strong></p>
+                    <ul>
+                        <li>At least 8 characters</li>
+                        <li>At least 1 uppercase letter</li>
+                        <li>At least 1 lowercase letter</li>
+                        <li>At least 1 number</li>
+                        <li>At least 1 special character (including _)</li>
+                    </ul>
+                    <p>If you did not request this, please ignore this email.</p>
+                ";
+
+                $mail->send();
+                $msg = "✅ Password reset link has been sent (check your Mailtrap inbox).";
+            } catch (Exception $e) {
+                $msg = "❌ Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            }
+
         } else {
             $msg = "❌ Email not found!";
         }
@@ -47,163 +86,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Forgot Password - MealMate</title>
     <link rel="stylesheet" href="../assets/form.css?v=1">
     <link rel="stylesheet" href="../assets/style.css">
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .main-content {
-            flex-grow: 1;
-        }
-
-        .form-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .simple-footer {
-            margin-top: auto;
-            background-color:#0d0d0d;
-            color:#fff;
-            padding:20px 0;
-            text-align:center;
-            font-family:'Poppins', sans-serif;
-            font-size:14px;
-            width:100%;
-            position: relative;
-        }
-        
-        .simple-footer::before {
-            content:''; 
-            position:absolute;
-            top:0;
-            left:0;
-            width:100%;
-            height:2px;
-            background-color:#FF4500;
-        }
-
-        .nav-logo {
-            color: #FF4500;
-            font-size: 32px;
-            font-weight: 700;
-            text-shadow: 3px 3px 6px #000;
-            margin-right: auto;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-menu a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: 400;
-            position: relative;
-        }
-
-        .nav-menu a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #FF4500;
-            transition: width 0.3s;
-        }
-
-        .nav-menu a:hover, .nav-menu a.active {
-            color: #FF4500;
-        }
-        
-        .nav-menu a:hover::after, .nav-menu a.active::after {
-            width: 100%;
-        }
-
-        /* Form messages */
-        .msg {
-            margin-bottom: 15px;
-            color: red;
-            text-align: center;
-        }
-
-        form input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        form button {
-            background-color: #FF4500;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        form button:hover {
-            background-color: #e03e00;
-        }
-
-        .back-login {
-            margin-top: 15px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .back-login a {
-            color: #FF4500;
-            text-decoration: none;
-        }
-
-        .back-login a:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
-    <div class="main-content">
-        <header>
-            <h1 class="nav-logo">MealMate</h1>
-            <nav class="nav-menu">
-                <a href="../index.php">Home</a>
-                <a href="register.php">Register</a>
-                <a href="../food_management/menu.php">Menu</a>
-                <a href="../cart/cart.php">Cart</a>
-            </nav>
-        </header>
+<div class="main-content" style="display:flex; flex-direction:column; min-height:100vh;">
+    <header>
+        <h1 class="nav-logo">MealMate</h1>
+        <nav class="nav-menu">
+            <a href="../index.php">Home</a>
+            <a href="register.php">Register</a>
+            <a href="../food_management/menu.php">Menu</a>
+            <a href="../cart/cart.php">Cart</a>
+        </nav>
+    </header>
 
-        <div class="form-container">
-            <h2>Forgot Password</h2>
+    <div class="form-container" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px;">
+        <h2>Forgot Password</h2>
 
-            <?php if ($msg != ""): ?>
-                <div class="msg"><?= $msg ?></div>
-            <?php endif; ?>
+        <?php if ($msg != ""): ?>
+            <div class="msg"><?= $msg ?></div>
+        <?php endif; ?>
 
-            <form action="forgot_password.php" method="POST">
-                <input type="email" name="email" placeholder="Enter your registered email" required>
-                <button type="submit">Send Reset Link</button>
-            </form>
+        <form action="forgot_password.php" method="POST" style="width:100%; max-width:400px;">
+            <input type="email" name="email" placeholder="Enter your registered email" required>
+            
+            <!-- Tooltip / Password guide -->
+            <small style="display:block; margin-bottom:10px; color:#555;">
+                Note: The password you set after resetting must have at least 8 characters, including uppercase, lowercase, number, and special character (e.g., !@#$%^&* or _).
+            </small>
+            
+            <button type="submit">Send Reset Link</button>
 
-            <div class="back-login">
-                <a href="login.php">Back to Login</a>
+            <!-- Back to login slightly below the button -->
+            <div class="back-login" style="margin-top:20px; text-align:center;">
+                <a href="login.php" style="color:#FF4500;">Back to Login</a>
             </div>
-        </div>
+        </form>
     </div>
+</div>
 
-    <?php include '../includes/simple_footer.php'; ?>
+<?php include '../includes/simple_footer.php'; ?>
 </body>
 </html>
