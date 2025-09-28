@@ -3,9 +3,9 @@ session_start();
 require_once __DIR__ . '/../../../includes/db_connect.php';
 require_once __DIR__ . '/../../../orders/order_controller.php';
 
-// Check if admin is logged in (adjust this according to your admin auth system)
-if (!isset($_SESSION['admin_id']) && !isset($_SESSION['is_admin'])) {
-    header('Location: ../../login.php'); // Corrected path
+// Check if user is logged in and has admin role
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../../../users/login.php");
     exit();
 }
 
@@ -34,42 +34,136 @@ $page_title = "Orders Dashboard - MealMate Admin";
     <title><?php echo $page_title; ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Admin Orders Dashboard Styling */
+        /* === Global Styles === */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            background-color: #000;
+            font-family: 'Poppins', sans-serif;
             color: #fff;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
+            scroll-behavior: smooth;
+            background-color: #0d0d0d;
             overflow-x: hidden;
-            font-size: 16px;
+            position: relative;
         }
 
+        /* === Navbar Styles === */
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #FF4500;
+            padding: 20px 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            color: #FF4500;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 3px 3px 6px #000;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            padding: 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #FF4500;
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #FF4500;
+        }
+
+        .nav-menu a:hover::after,
+        .nav-menu a.active::after {
+            width: 100%;
+        }
+
+        /* === Main Content Container === */
         .admin-container {
-            min-height: 100vh;
-            padding: 2rem;
+            width: 100%;
+            max-width: 1400px;
+            margin: 120px auto 2rem auto;
+            padding: 0 50px;
         }
 
+        /* === Header Section === */
         .dashboard-header {
             text-align: center;
             margin-bottom: 2rem;
+            padding: 0.5rem 0;
+            position: relative;
         }
 
         .dashboard-header h1 {
+            color: #ff4500;
             font-size: 2.5rem;
-            color: #FF4500;
-            margin: 0;
-            font-weight: 700;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
         }
 
         .dashboard-header p {
+            color: #cccccc;
             font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin: 1rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-header::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            width: 100vw;
+            height: 2px;
+            background-color: #ff4500;
+            margin-left: calc(-50vw + 50%);
         }
 
         /* Statistics Cards */
@@ -81,11 +175,11 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #111, #1a1a1a);
-            border-radius: 15px;
+            background: rgba(20,20,20,0.95);
+            border-radius: 12px;
             border: 2px solid #FF4500;
             padding: 1.5rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 4px 20px rgba(255,69,0,0.5);
             text-align: center;
         }
 
@@ -115,11 +209,12 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         /* Urgent Orders Alert */
         .urgent-alerts {
-            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
-            border-radius: 15px;
+            background: rgba(20,20,20,0.95);
+            border-radius: 12px;
             border: 2px solid #dc3545;
             padding: 1.5rem;
             margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3);
         }
 
         .urgent-alerts h3 {
@@ -147,12 +242,12 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         /* Filters Section */
         .filters-section {
-            background: linear-gradient(135deg, #111, #1a1a1a);
-            border-radius: 15px;
+            background: rgba(20,20,20,0.95);
+            border-radius: 12px;
             border: 2px solid #FF4500;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 4px 20px rgba(255,69,0,0.5);
         }
 
         .filters-grid {
@@ -213,25 +308,37 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: #ff4500;
             color: #000;
             box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
         }
 
+        .btn-primary:hover {
+            background: #e65c00;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 69, 0, 0.5);
+        }
+
         .btn-secondary {
-            background: linear-gradient(135deg, #444, #666);
+            background: #555;
             color: #fff;
             border: 2px solid #666;
         }
 
+        .btn-secondary:hover {
+            background: #777;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+        }
+
         .btn-success {
-            background: linear-gradient(135deg, #28a745, #32CD32);
-            color: #000;
+            background: #28a745;
+            color: #fff;
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.35);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #dc3545, #c82333);
+            background: #dc3545;
             color: #fff;
             border: 2px solid #dc3545;
         }
@@ -242,18 +349,20 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         /* Orders Table */
         .orders-table-container {
-            background: linear-gradient(135deg, #111, #1a1a1a);
-            border-radius: 15px;
+            background: rgba(20,20,20,0.95);
+            border-radius: 12px;
             border: 2px solid #FF4500;
             padding: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 4px 20px rgba(255,69,0,0.5);
             overflow-x: auto;
+            margin-bottom: 2rem;
         }
 
         .orders-table {
             width: 100%;
             border-collapse: collapse;
             min-width: 800px;
+            color: #fff;
         }
 
         .orders-table th,
@@ -264,10 +373,11 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .orders-table th {
-            background: rgba(255, 69, 0, 0.1);
-            color: #FF4500;
-            font-weight: 700;
-            font-size: 1rem;
+            background-color: #ff4500;
+            color: #000;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
             position: sticky;
             top: 0;
             z-index: 10;
@@ -406,7 +516,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            background: #222;
             margin: 10% auto;
             padding: 2rem;
             border: 2px solid #FF4500;
@@ -454,7 +564,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         .pagination a, .pagination span {
             padding: 0.8rem 1.2rem;
-            background: linear-gradient(135deg, #111, #1a1a1a);
+            background: rgba(20,20,20,0.95);
             color: #fff;
             text-decoration: none;
             border-radius: 8px;
@@ -464,21 +574,44 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .pagination a:hover {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: #ff4500;
             color: #000;
             transform: translateY(-2px);
         }
 
         .pagination .current {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: #ff4500;
             color: #000;
             border-color: #FF4500;
+        }
+
+        /* === Footer Styles === */
+        .simple-footer {
+            background-color: #0d0d0d;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            position: relative;
+            width: 100%;
+            margin-top: 3rem;
+        }
+
+        .simple-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #FF4500;
         }
 
         /* Responsive Design */
         @media (max-width: 992px) {
             .admin-container {
-                padding: 1.5rem;
+                padding: 1.5rem 20px;
             }
 
             .stats-grid {
@@ -508,6 +641,15 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+            
+            .admin-container {
+                margin: 100px auto 1.5rem auto;
+                padding: 0 15px;
+            }
+
             .dashboard-header h1 {
                 font-size: 2rem;
             }
@@ -547,8 +689,32 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 1rem;
+            }
+            
+            .nav-logo {
+                font-size: 24px;
+            }
+            
+            .nav-menu {
+                gap: 1rem;
+            }
+            
+            .nav-menu a {
+                font-size: 14px;
+            }
+
             .admin-container {
-                padding: 1rem;
+                padding: 1rem 10px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .dashboard-header p {
+                font-size: 1rem;
             }
 
             .stats-grid {
@@ -569,6 +735,20 @@ $page_title = "Orders Dashboard - MealMate Admin";
 </head>
 
 <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">MealMate</h1>
+            <ul class="nav-menu">
+                <li><a href="/MealMate-online-food-ordering-system/index.php">Home</a></li>
+                <li><a href="../../../admin/admin_dashboard.php">Dashboard</a></li>
+                <li><a href="../../../food_management/manage_food.php">Manage Food</a></li>
+                <li><a href="/MealMate-online-food-ordering-system/users/admin/orders/admin_orders.php" class="active">Manage Orders</a></li>
+                <li><a href="../../../admin/manage_users.php">Manage Users</a></li>
+                <li><a href="../../../users/logout.php">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="admin-container">
         <div class="dashboard-header">
             <h1><i class="fas fa-tachometer-alt"></i> Orders Dashboard</h1>
@@ -681,7 +861,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
                         <?php foreach ($orders as $order): ?>
                         <tr data-order-id="<?php echo $order['order_id']; ?>">
                             <td>
-                                <a href="order_management.php?id=<?php echo $order['order_id']; ?>" class="order-number">
+                                <a href="admin_order_details.php?id=<?php echo $order['order_id']; ?>" class="order-number">
                                     #<?php echo htmlspecialchars($order['order_number']); ?>
                                 </a>
                             </td>
@@ -715,7 +895,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
                             </td>
                             <td>
                                 <div class="order-actions">
-                                    <a href="order_management.php?id=<?php echo $order['order_id']; ?>" 
+                                    <a href="admin_order_details.php?id=<?php echo $order['order_id']; ?>" 
                                        class="action-btn btn-primary">
                                         <i class="fas fa-eye"></i> View
                                     </a>
@@ -802,6 +982,10 @@ $page_title = "Orders Dashboard - MealMate Admin";
                 </div>
             </form>
         </div>
+    </div>
+
+    <div class="simple-footer">
+        &copy; <?= date('Y') ?> MealMate. All rights reserved.
     </div>
 
     <script>
