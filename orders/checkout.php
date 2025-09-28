@@ -4,6 +4,7 @@ session_start();
 require_once __DIR__ . '/../includes/menu_header.php';
 require_once __DIR__ . '/../includes/db_connect.php';
 require_once __DIR__ . '/../cart/cart_controller.php';
+require_once __DIR__ . '/../orders/order_controller.php'; // Add this line
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -31,24 +32,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($address) || empty($city) || empty($postal_code) || empty($phone)) {
             $_SESSION['order_error'] = "Please fill in all required address fields.";
         } else {
-            // In a real application, you would save the order to database
-            // For this example, we'll just clear the cart and show success
-            if (clearCart($conn, $user_id)) {
-                $_SESSION['order_success'] = "Your order has been placed successfully!";
-                $_SESSION['order_details'] = [
+            try {
+                // Prepare delivery details
+                $delivery_details = [
                     'address' => $address,
                     'city' => $city,
                     'postal_code' => $postal_code,
                     'phone' => $phone,
-                    'special_instructions' => $special_instructions,
-                    'total' => $grand_total
+                    'special_instructions' => $special_instructions
                 ];
-                header("Location: checkout.php");
-                exit();
-            } else {
-                $_SESSION['order_error'] = "There was an error placing your order. Please try again.";
-                header("Location: checkout.php");
-                exit();
+                
+                // Create order in database - THIS IS THE KEY PART
+                $order_id = createOrderFromCart($conn, $user_id, $delivery_details);
+                
+                if ($order_id) {
+                    // Get the created order details
+                    $order = getOrderDetails($conn, $order_id, $user_id);
+                    
+                    $_SESSION['order_success'] = "Your order has been placed successfully! Order #" . $order['order_number'];
+                    $_SESSION['order_details'] = [
+                        'order_id' => $order_id,
+                        'order_number' => $order['order_number'],
+                        'address' => $address,
+                        'city' => $city,
+                        'postal_code' => $postal_code,
+                        'phone' => $phone,
+                        'special_instructions' => $special_instructions,
+                        'total' => $grand_total
+                    ];
+                    
+                    header("Location: checkout.php");
+                    exit();
+                } else {
+                    $_SESSION['order_error'] = "There was an error placing your order. Please try again.";
+                }
+            } catch (Exception $e) {
+                $_SESSION['order_error'] = "Error: " . $e->getMessage();
+                error_log("Order creation error: " . $e->getMessage());
             }
         }
     }
@@ -63,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Checkout - MealMate</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Checkout Page Styles - Matching Cart Theme */
+        /* Your existing CSS remains the same */
         * {
             box-sizing: border-box;
         }
@@ -84,10 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding-top: 80px;
             width: 100%;
             overflow-x: hidden;
-        }
-
-        .sidebar {
-            display: none !important;
         }
 
         .content {
@@ -124,6 +140,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             line-height: 1.5;
         }
 
+        .alert {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #155724, #1e7e34);
+            color: #fff;
+            border: 2px solid #28a745;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #721c24, #c82333);
+            color: #fff;
+            border: 2px solid #dc3545;
+        }
+
         .checkout-container {
             display: flex;
             flex-direction: row;
@@ -132,15 +169,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
         }
 
-        /* Order Summary Section */
-        .order-summary-section {
+        .order-summary-section, .order-details-section {
             flex: 1;
             background: linear-gradient(135deg, #111, #1a1a1a);
             border-radius: 15px;
             border: 2px solid #FF4500;
             padding: 2rem;
             box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
-            overflow: hidden;
         }
 
         .section-title {
@@ -165,13 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             padding: 1.2rem;
             border-bottom: 1px solid rgba(255, 69, 0, 0.2);
-            transition: all 0.3s ease;
-            border-radius: 8px;
             margin-bottom: 0.5rem;
-        }
-
-        .order-item:hover {
-            background: linear-gradient(135deg, rgba(255, 69, 0, 0.05), rgba(255, 107, 53, 0.03));
         }
 
         .item-info {
@@ -191,7 +220,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 3px 8px rgba(255, 69, 0, 0.2);
         }
 
         .item-image img {
@@ -249,17 +277,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 1rem;
         }
 
-        /* Order Details Section */
-        .order-details-section {
-            flex: 1;
-            background: linear-gradient(135deg, #111, #1a1a1a);
-            border-radius: 15px;
-            border: 2px solid #FF4500;
-            padding: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
-            height: fit-content;
-        }
-
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -280,18 +297,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 8px;
             color: #fff;
             font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #FF6B35;
-            box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.2);
-        }
-
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
         }
 
         .required::after {
@@ -314,7 +319,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 10px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.3s ease;
             font-size: 1.2rem;
             border: none;
             cursor: pointer;
@@ -326,44 +330,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
         }
 
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #e63e00, #FF5A29);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 18px rgba(255, 69, 0, 0.5);
-        }
-
         .btn-secondary {
             background: linear-gradient(135deg, #444, #666);
             color: #fff;
             border: 2px solid #666;
         }
 
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #555, #777);
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
-        }
-
-        /* Alerts */
-        .alert {
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+        .order-success-details {
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 107, 53, 0.05));
             border-radius: 10px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.1rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 69, 0, 0.3);
         }
 
-        .alert-success {
-            background: linear-gradient(135deg, #155724, #1e7e34);
-            color: #fff;
-            border: 2px solid #28a745;
-        }
-
-        .alert-danger {
-            background: linear-gradient(135deg, #721c24, #c82333);
-            color: #fff;
-            border: 2px solid #dc3545;
+        .order-detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
         }
 
         .empty-cart-message {
@@ -379,75 +365,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 1rem;
             display: block;
         }
-
-        /* Success Order Details */
-        .order-success-details {
-            background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 107, 53, 0.05));
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            border: 1px solid rgba(255, 69, 0, 0.3);
-        }
-
-        .order-success-details h3 {
-            color: #FF4500;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid rgba(255, 69, 0, 0.3);
-            padding-bottom: 0.5rem;
-        }
-
-        .order-detail-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.8rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-
-        .order-detail-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .checkout-container {
-                flex-direction: column;
-            }
-            
-            .order-summary-section, .order-details-section {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                padding: 1.5rem;
-            }
-            
-            .page-header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .page-header p {
-                font-size: 1.1rem;
-            }
-            
-            .order-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            
-            .item-info {
-                width: 100%;
-            }
-            
-            .item-quantity {
-                align-self: flex-end;
-            }
-        }
     </style>
 </head>
 <body>
@@ -462,17 +379,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php
             // Display success or error messages
             if (isset($_SESSION['order_success'])) {
-                echo '<div class="alert alert-success">' . 
-                     '<i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>' . 
-                     htmlspecialchars($_SESSION['order_success']) . 
-                     '</div>';
+                echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['order_success']) . '</div>';
                 unset($_SESSION['order_success']);
             }
             if (isset($_SESSION['order_error'])) {
-                echo '<div class="alert alert-danger">' . 
-                     '<i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>' . 
-                     htmlspecialchars($_SESSION['order_error']) . 
-                     '</div>';
+                echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['order_error']) . '</div>';
                 unset($_SESSION['order_error']);
             }
             ?>
@@ -482,9 +393,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="fas fa-shopping-cart icon"></i>
                     <h3>Your cart is empty</h3>
                     <p>Please add items to your cart before proceeding to checkout.</p>
-                    <a href="../food_management/menu.php" class="btn-primary" style="margin-top: 1.5rem; display: inline-block; text-decoration: none;">
-                        <i class="fas fa-utensils" style="margin-right: 0.5rem;"></i>Browse Menu
-                    </a>
+                    <a href="../food_management/menu.php" class="btn-primary" style="margin-top: 1.5rem; display: inline-block; text-decoration: none;">Browse Menu</a>
                 </div>
             <?php else: ?>
                 <div class="checkout-container">
@@ -498,14 +407,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="item-image">
                                             <img src="../assets/images/menu/<?php echo htmlspecialchars($item['image']); ?>" 
                                                  alt="<?php echo htmlspecialchars($item['food_name']); ?>"
-                                                 onerror="this.src='../assets/images/menu/default.jpg'; this.onerror=null;">
+                                                 onerror="this.src='../assets/images/menu/default.jpg';">
                                         </div>
                                         <div class="item-details">
                                             <h4><?php echo htmlspecialchars($item['food_name']); ?></h4>
-                                            <p class="item-price">Rs.<?php echo htmlspecialchars(number_format($item['price'], 2)); ?> each</p>
+                                            <p class="item-price">Rs.<?php echo number_format($item['price'], 2); ?> each</p>
                                         </div>
                                     </div>
-                                    <span class="item-quantity">Qty: <?php echo htmlspecialchars($item['quantity']); ?></span>
+                                    <span class="item-quantity">Qty: <?php echo $item['quantity']; ?></span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -513,26 +422,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="order-totals">
                             <div class="total-row">
                                 <span>Subtotal:</span>
-                                <span>Rs.<?php echo htmlspecialchars(number_format($cart_total, 2)); ?></span>
+                                <span>Rs.<?php echo number_format($cart_total, 2); ?></span>
                             </div>
                             <div class="total-row">
                                 <span>Delivery Fee:</span>
-                                <span>Rs.<?php echo htmlspecialchars(number_format($delivery_fee, 2)); ?></span>
+                                <span>Rs.<?php echo number_format($delivery_fee, 2); ?></span>
                             </div>
                             <div class="total-row grand-total">
                                 <span>Total Amount:</span>
-                                <span>Rs.<?php echo htmlspecialchars(number_format($grand_total, 2)); ?></span>
+                                <span>Rs.<?php echo number_format($grand_total, 2); ?></span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="order-details-section">
-                        <?php if (isset($_SESSION['order_success']) && isset($_SESSION['order_details'])): ?>
+                        <?php if (isset($_SESSION['order_details'])): ?>
                             <h2 class="section-title">Order Confirmed!</h2>
                             <p>Thank you for your order. Here are your order details:</p>
                             
                             <div class="order-success-details">
-                                <h3>Delivery Information</h3>
+                                <h3>Order #<?php echo htmlspecialchars($_SESSION['order_details']['order_number']); ?></h3>
                                 <div class="order-detail-item">
                                     <span>Address:</span>
                                     <span><?php echo htmlspecialchars($_SESSION['order_details']['address']); ?></span>
@@ -542,33 +451,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <span><?php echo htmlspecialchars($_SESSION['order_details']['city']); ?></span>
                                 </div>
                                 <div class="order-detail-item">
-                                    <span>Postal Code:</span>
-                                    <span><?php echo htmlspecialchars($_SESSION['order_details']['postal_code']); ?></span>
-                                </div>
-                                <div class="order-detail-item">
                                     <span>Phone:</span>
                                     <span><?php echo htmlspecialchars($_SESSION['order_details']['phone']); ?></span>
                                 </div>
-                                <?php if (!empty($_SESSION['order_details']['special_instructions'])): ?>
-                                <div class="order-detail-item">
-                                    <span>Special Instructions:</span>
-                                    <span><?php echo htmlspecialchars($_SESSION['order_details']['special_instructions']); ?></span>
-                                </div>
-                                <?php endif; ?>
                                 <div class="order-detail-item grand-total">
                                     <span>Total Paid:</span>
-                                    <span>Rs.<?php echo htmlspecialchars(number_format($_SESSION['order_details']['total'], 2)); ?></span>
+                                    <span>Rs.<?php echo number_format($_SESSION['order_details']['total'], 2); ?></span>
                                 </div>
                             </div>
                             
                             <div class="checkout-actions">
-                                <a href="../food_management/menu.php" class="btn-primary">
-                                    <i class="fas fa-utensils" style="margin-right: 0.5rem;"></i>Order Again
-                                </a>
-                                <a href="../index.php" class="btn-secondary">
-                                    <i class="fas fa-home" style="margin-right: 0.5rem;"></i>Back to Home
-                                </a>
+                                <a href="../orders/my_orders.php" class="btn-primary">View My Orders</a>
+                                <a href="../food_management/menu.php" class="btn-secondary">Order Again</a>
                             </div>
+                            
+                            <?php
+                            // Clear the order details after showing them
+                            unset($_SESSION['order_details']);
+                            ?>
+                            
                         <?php else: ?>
                             <h2 class="section-title">Delivery Details</h2>
                             <form action="checkout.php" method="POST">
@@ -602,12 +503,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 
                                 <div class="checkout-actions">
-                                    <button type="submit" name="confirm_order" class="btn-primary">
-                                        <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>Confirm Order
-                                    </button>
-                                    <a href="cart.php" class="btn-secondary">
-                                        <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>Back to Cart
-                                    </a>
+                                    <button type="submit" name="confirm_order" class="btn-primary">Confirm Order</button>
+                                    <a href="../cart/cart.php" class="btn-secondary">Back to Cart</a>
                                 </div>
                             </form>
                         <?php endif; ?>
@@ -616,36 +513,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
         </div>
     </div>
-
-    <script>
-        // Add some interactive elements
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add focus effects to form inputs
-            const inputs = document.querySelectorAll('input, textarea');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.style.transform = 'translateY(-2px)';
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.parentElement.style.transform = 'translateY(0)';
-                });
-            });
-            
-            // Phone number formatting
-            const phoneInput = document.getElementById('phone');
-            if (phoneInput) {
-                phoneInput.addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, '');
-                    if (value.length > 10) value = value.substring(0, 10);
-                    e.target.value = value;
-                });
-            }
-        });
-    </script>
 </body>
 </html>
 
-<?php
-include __DIR__ . '/../includes/simple_footer.php';
-?>
+<?php include __DIR__ . '/../includes/simple_footer.php'; ?>
