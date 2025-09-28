@@ -273,7 +273,7 @@ body {
                     <li><a href="admin_dashboard.php" class="active">Dashboard</a></li>
                     <li><a href="manage_food.php">Manage Food</a></li>
                     <li><a href="manage_users.php">Manage Users</a></li>
-                    <li><a href="manage_orders.php">Manage Orders</a></li>
+                    <li><a href="orders/admin_order_details.php">Manage Orders</a></li>
                     <li><a href="../logout.php">Logout</a></li>
                 </ul>
             </div>
@@ -285,7 +285,7 @@ body {
                 <div class="quick-links">
                     <a href="manage_food.php">Manage Food</a>
                     <a href="manage_users.php">Manage Users</a>
-                    <a href="manage_orders.php">Manage Orders</a>
+                    <a href="orders/admin_order_details.php">Manage Orders</a>
                 </div>
             </div>
         </div>
