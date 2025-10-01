@@ -1,10 +1,9 @@
 <?php
 session_start();
-// Include the necessary files
 require_once __DIR__ . '/../includes/menu_header.php';
 require_once __DIR__ . '/../includes/db_connect.php';
 require_once __DIR__ . '/../cart/cart_controller.php';
-require_once __DIR__ . '/../orders/order_controller.php'; // Add this line
+require_once __DIR__ . '/../orders/order_controller.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -18,20 +17,60 @@ $cart_total = calculateCartTotal($conn, $user_id);
 $delivery_fee = 250.00;
 $grand_total = $cart_total + $delivery_fee;
 
+// Validation functions
+function validatePhone($phone) {
+    // Remove spaces and dashes for validation
+    $phone = preg_replace('/[\s\-]/', '', $phone);
+    // Check if it's a valid Sri Lankan phone number (10 digits starting with 0)
+    return preg_match('/^0[0-9]{9}$/', $phone);
+}
+
+function validatePostalCode($postal_code) {
+    // Postal code should only contain numbers (5 digits for Sri Lanka)
+    return preg_match('/^[0-9]{5}$/', $postal_code);
+}
+
+function sanitizeInput($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
 // Handle order confirmation
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['confirm_order'])) {
-        // Process order with address details
-        $address = $_POST['address'] ?? '';
-        $city = $_POST['city'] ?? '';
-        $postal_code = $_POST['postal_code'] ?? '';
-        $phone = $_POST['phone'] ?? '';
-        $special_instructions = $_POST['special_instructions'] ?? '';
+        $address = sanitizeInput($_POST['address'] ?? '');
+        $city = sanitizeInput($_POST['city'] ?? '');
+        $postal_code = sanitizeInput($_POST['postal_code'] ?? '');
+        $phone = sanitizeInput($_POST['phone'] ?? '');
+        $special_instructions = sanitizeInput($_POST['special_instructions'] ?? '');
+        $payment_method = $_POST['payment_method'] ?? '';
+        
+        $errors = [];
         
         // Validate required fields
-        if (empty($address) || empty($city) || empty($postal_code) || empty($phone)) {
-            $_SESSION['order_error'] = "Please fill in all required address fields.";
-        } else {
+        if (empty($address)) {
+            $errors[] = "Delivery address is required.";
+        }
+        if (empty($city)) {
+            $errors[] = "City is required.";
+        }
+        if (empty($postal_code)) {
+            $errors[] = "Postal code is required.";
+        } elseif (!validatePostalCode($postal_code)) {
+            $errors[] = "Postal code must be 5 digits only.";
+        }
+        if (empty($phone)) {
+            $errors[] = "Phone number is required.";
+        } elseif (!validatePhone($phone)) {
+            $errors[] = "Please enter a valid 10-digit Sri Lankan phone number (e.g., 0771234567).";
+        }
+        if (empty($payment_method)) {
+            $errors[] = "Please select a payment method.";
+        }
+        
+        if (empty($errors)) {
             try {
                 // Prepare delivery details
                 $delivery_details = [
@@ -39,37 +78,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'city' => $city,
                     'postal_code' => $postal_code,
                     'phone' => $phone,
-                    'special_instructions' => $special_instructions
+                    'special_instructions' => $special_instructions,
+                    'payment_method' => $payment_method
                 ];
                 
-                // Create order in database - THIS IS THE KEY PART
-                $order_id = createOrderFromCart($conn, $user_id, $delivery_details);
+                // Store delivery details in session for payment processing
+                $_SESSION['checkout_data'] = $delivery_details;
                 
-                if ($order_id) {
-                    // Get the created order details
-                    $order = getOrderDetails($conn, $order_id, $user_id);
+                if ($payment_method === 'cash_on_delivery') {
+                    // Create order immediately for COD
+                    $order_id = createOrderFromCart($conn, $user_id, $delivery_details);
                     
-                    $_SESSION['order_success'] = "Your order has been placed successfully! Order #" . $order['order_number'];
-                    $_SESSION['order_details'] = [
-                        'order_id' => $order_id,
-                        'order_number' => $order['order_number'],
-                        'address' => $address,
-                        'city' => $city,
-                        'postal_code' => $postal_code,
-                        'phone' => $phone,
-                        'special_instructions' => $special_instructions,
-                        'total' => $grand_total
-                    ];
-                    
-                    header("Location: checkout.php");
-                    exit();
+                    if ($order_id) {
+                        $order = getOrderDetails($conn, $order_id, $user_id);
+                        
+                        $_SESSION['order_success'] = "Your order has been placed successfully! Order #" . $order['order_number'];
+                        $_SESSION['order_details'] = [
+                            'order_id' => $order_id,
+                            'order_number' => $order['order_number'],
+                            'address' => $address,
+                            'city' => $city,
+                            'postal_code' => $postal_code,
+                            'phone' => $phone,
+                            'special_instructions' => $special_instructions,
+                            'payment_method' => 'Cash on Delivery',
+                            'total' => $grand_total
+                        ];
+                        
+                        header("Location: checkout.php");
+                        exit();
+                    } else {
+                        $errors[] = "There was an error placing your order. Please try again.";
+                    }
                 } else {
-                    $_SESSION['order_error'] = "There was an error placing your order. Please try again.";
+                    // Redirect to payment gateway
+                    header("Location: payment_gateway.php");
+                    exit();
                 }
             } catch (Exception $e) {
-                $_SESSION['order_error'] = "Error: " . $e->getMessage();
+                $errors[] = "Error: " . $e->getMessage();
                 error_log("Order creation error: " . $e->getMessage());
             }
+        }
+        
+        if (!empty($errors)) {
+            $_SESSION['order_error'] = implode("<br>", $errors);
         }
     }
 }
@@ -83,7 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Checkout - MealMate</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Your existing CSS remains the same */
         * {
             box-sizing: border-box;
         }
@@ -299,9 +351,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 1rem;
         }
 
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #FF6B35;
+            box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.2);
+        }
+
+        .form-group.error input {
+            border-color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
         .required::after {
             content: " *";
             color: #FF4500;
+        }
+
+        /* Payment Method Styles */
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-option {
+            position: relative;
+        }
+
+        .payment-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .payment-label {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem;
+            background: rgba(255, 69, 0, 0.05);
+            border: 2px solid rgba(255, 69, 0, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option input[type="radio"]:checked + .payment-label {
+            background: rgba(255, 69, 0, 0.15);
+            border-color: #FF4500;
+        }
+
+        .payment-icon {
+            font-size: 2rem;
+            color: #FF4500;
+            width: 50px;
+            text-align: center;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-info h4 {
+            margin: 0 0 0.3rem;
+            color: #FF4500;
+            font-size: 1.2rem;
+        }
+
+        .payment-info p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
         }
 
         .checkout-actions {
@@ -322,6 +447,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 1.2rem;
             border: none;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
@@ -330,10 +456,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
         }
 
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #e63e00, #FF5A29);
+            transform: translateY(-2px);
+        }
+
         .btn-secondary {
             background: linear-gradient(135deg, #444, #666);
             color: #fff;
             border: 2px solid #666;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #555, #777);
+            transform: translateY(-2px);
         }
 
         .order-success-details {
@@ -344,12 +480,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid rgba(255, 69, 0, 0.3);
         }
 
+        .order-success-details h3 {
+            color: #FF4500;
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
         .order-detail-item {
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.8rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .cod-notice {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cod-notice i {
+            font-size: 2rem;
+            color: #FFD700;
+        }
+
+        .cod-notice-text h4 {
+            margin: 0 0 0.5rem;
+            color: #FFD700;
+            font-size: 1.2rem;
+        }
+
+        .cod-notice-text p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .empty-cart-message {
@@ -365,6 +534,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 1rem;
             display: block;
         }
+
+        @media (max-width: 992px) {
+            .checkout-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .order-summary-section, .order-details-section {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -377,13 +566,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <?php
-            // Display success or error messages
             if (isset($_SESSION['order_success'])) {
-                echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['order_success']) . '</div>';
+                echo '<div class="alert alert-success">' . $_SESSION['order_success'] . '</div>';
                 unset($_SESSION['order_success']);
             }
             if (isset($_SESSION['order_error'])) {
-                echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['order_error']) . '</div>';
+                echo '<div class="alert alert-danger">' . $_SESSION['order_error'] . '</div>';
                 unset($_SESSION['order_error']);
             }
             ?>
@@ -438,7 +626,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="order-details-section">
                         <?php if (isset($_SESSION['order_details'])): ?>
                             <h2 class="section-title">Order Confirmed!</h2>
-                            <p>Thank you for your order. Here are your order details:</p>
+                            <p style="text-align: center; color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">Thank you for your order. Here are your order details:</p>
                             
                             <div class="order-success-details">
                                 <h3>Order #<?php echo htmlspecialchars($_SESSION['order_details']['order_number']); ?></h3>
@@ -454,11 +642,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <span>Phone:</span>
                                     <span><?php echo htmlspecialchars($_SESSION['order_details']['phone']); ?></span>
                                 </div>
+                                <div class="order-detail-item">
+                                    <span>Payment:</span>
+                                    <span><?php echo htmlspecialchars($_SESSION['order_details']['payment_method']); ?></span>
+                                </div>
                                 <div class="order-detail-item grand-total">
-                                    <span>Total Paid:</span>
+                                    <span>Total Amount:</span>
                                     <span>Rs.<?php echo number_format($_SESSION['order_details']['total'], 2); ?></span>
                                 </div>
                             </div>
+
+                            <?php if ($_SESSION['order_details']['payment_method'] === 'Cash on Delivery'): ?>
+                                <div class="cod-notice">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <div class="cod-notice-text">
+                                        <h4>Cash on Delivery</h4>
+                                        <p>Please keep Rs.<?php echo number_format($_SESSION['order_details']['total'], 2); ?> ready to pay the delivery person upon arrival.</p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                             
                             <div class="checkout-actions">
                                 <a href="../orders/my_orders.php" class="btn-primary">View My Orders</a>
@@ -466,13 +668,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                             
                             <?php
-                            // Clear the order details after showing them
                             unset($_SESSION['order_details']);
                             ?>
                             
                         <?php else: ?>
-                            <h2 class="section-title">Delivery Details</h2>
-                            <form action="checkout.php" method="POST">
+                            <h2 class="section-title">Delivery & Payment Details</h2>
+                            <form action="checkout.php" method="POST" id="checkoutForm">
                                 <div class="form-group">
                                     <label for="address" class="required">Delivery Address</label>
                                     <input type="text" id="address" name="address" placeholder="Enter your full address" required 
@@ -487,24 +688,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 
                                 <div class="form-group">
                                     <label for="postal_code" class="required">Postal Code</label>
-                                    <input type="text" id="postal_code" name="postal_code" placeholder="Enter postal code" required
+                                    <input type="text" id="postal_code" name="postal_code" placeholder="5-digit postal code (e.g., 10100)" required maxlength="5"
                                            value="<?php echo isset($_POST['postal_code']) ? htmlspecialchars($_POST['postal_code']) : ''; ?>">
+                                    <small style="color: rgba(255, 255, 255, 0.6);">Numbers only, 5 digits</small>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="phone" class="required">Phone Number</label>
-                                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required
+                                    <input type="tel" id="phone" name="phone" placeholder="10-digit number (e.g., 0771234567)" required maxlength="10"
                                            value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
+                                    <small style="color: rgba(255, 255, 255, 0.6);">Format: 07XXXXXXXX</small>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="special_instructions">Special Instructions (Optional)</label>
-                                    <textarea id="special_instructions" name="special_instructions" placeholder="Any special delivery instructions..."><?php echo isset($_POST['special_instructions']) ? htmlspecialchars($_POST['special_instructions']) : ''; ?></textarea>
+                                    <textarea id="special_instructions" name="special_instructions" rows="3" placeholder="Any special delivery instructions..."><?php echo isset($_POST['special_instructions']) ? htmlspecialchars($_POST['special_instructions']) : ''; ?></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="required">Payment Method</label>
+                                    <div class="payment-methods">
+                                        <div class="payment-option">
+                                            <input type="radio" id="cod" name="payment_method" value="cash_on_delivery" required>
+                                            <label for="cod" class="payment-label">
+                                                <div class="payment-icon">
+                                                    <i class="fas fa-money-bill-wave"></i>
+                                                </div>
+                                                <div class="payment-info">
+                                                    <h4>Cash on Delivery</h4>
+                                                    <p>Pay with cash when your order arrives</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="payment-option">
+                                            <input type="radio" id="online" name="payment_method" value="online_payment" required>
+                                            <label for="online" class="payment-label">
+                                                <div class="payment-icon">
+                                                    <i class="fas fa-credit-card"></i>
+                                                </div>
+                                                <div class="payment-info">
+                                                    <h4>Pay Online</h4>
+                                                    <p>Secure payment with credit/debit card</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div class="checkout-actions">
-                                    <button type="submit" name="confirm_order" class="btn-primary">Confirm Order</button>
-                                    <a href="../cart/cart.php" class="btn-secondary">Back to Cart</a>
+                                    <button type="submit" name="confirm_order" class="btn-primary">
+                                        <i class="fas fa-check-circle"></i> Confirm Order
+                                    </button>
+                                    <a href="../cart/cart.php" class="btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to Cart
+                                    </a>
                                 </div>
                             </form>
                         <?php endif; ?>
@@ -513,6 +751,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
         </div>
     </div>
+
+    <script>
+        // Form validation
+        document.getElementById('checkoutForm')?.addEventListener('submit', function(e) {
+            const postalCode = document.getElementById('postal_code').value;
+            const phone = document.getElementById('phone').value;
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+            
+            let errors = [];
+            
+            // Validate postal code - only numbers, 5 digits
+            if (!/^[0-9]{5}$/.test(postalCode)) {
+                errors.push('Postal code must be exactly 5 digits.');
+            }
+            
+            // Validate phone - Sri Lankan format
+            const cleanPhone = phone.replace(/[\s\-]/g, '');
+            if (!/^0[0-9]{9}$/.test(cleanPhone)) {
+                errors.push('Phone number must be 10 digits starting with 0 (e.g., 0771234567).');
+            }
+            
+            // Validate payment method
+            if (!paymentMethod) {
+                errors.push('Please select a payment method.');
+            }
+            
+            if (errors.length > 0) {
+                e.preventDefault();
+                alert(errors.join('\n'));
+                return false;
+            }
+        });
+
+        // Real-time validation for postal code
+        document.getElementById('postal_code')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Real-time validation for phone
+        document.getElementById('phone')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    </script>
 </body>
 </html>
 
