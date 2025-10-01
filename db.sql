@@ -44,16 +44,21 @@ CREATE TABLE orders (
     total_amount DECIMAL(10,2) NOT NULL,
     delivery_fee DECIMAL(10,2) DEFAULT 250.00,
     grand_total DECIMAL(10,2) NOT NULL,
+    payment_status ENUM('pending', 'paid', 'failed') DEFAULT 'pending',
+    payment_method VARCHAR(50) DEFAULT 'Cash on Delivery',
     order_status ENUM('pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled') DEFAULT 'pending',
     delivery_address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
     postal_code VARCHAR(20) NOT NULL,
     phone VARCHAR(15) NOT NULL,
     special_instructions TEXT,
+
     estimated_delivery_time DATETIME,
     actual_delivery_time DATETIME NULL,
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
