@@ -12,7 +12,7 @@ $base_path = '/MealMate-online-food-ordering-system';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <title>MealMate</title>
+    <title>MealMate - Delicious Food Delivered</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <?php
@@ -25,6 +25,9 @@ $base_path = '/MealMate-online-food-ordering-system';
         echo '<link rel="stylesheet" href="' . $base_path . '/assets/form.css">';
     }
     ?>
+    
+    <!-- Theme Toggle System - Load before body -->
+    <script src="<?php echo $base_path; ?>/theme-toggle.js"></script>
 </head>
 <body>
     <header>
@@ -57,7 +60,7 @@ $base_path = '/MealMate-online-food-ordering-system';
     </header>
 
     <div id="sideNav" class="side-nav">
-        <?php if ($current_page == 'iQndex.php'): ?>
+        <?php if ($current_page == 'index.php'): ?>
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="<?php echo $base_path; ?>/users/profile.php"><i class="fas fa-user"></i> Profile</a>
                 <a href="<?php echo $base_path; ?>/users/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
