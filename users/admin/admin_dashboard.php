@@ -272,8 +272,8 @@ body {
                     <li><a href="<?php echo $base_path; ?>/index.php">Home</a></li>
                     <li><a href="admin_dashboard.php" class="active">Dashboard</a></li>
                     <li><a href="manage_food.php">Manage Food</a></li>
-                    <li><a href="manage_users.php">Manage Users</a></li>
                     <li><a href="../admin/orders/admin_orders.php">Manage Orders</a></li>
+                    <li><a href="manage_users.php">Manage Users</a></li>
                     <li><a href="../logout.php">Logout</a></li>
                 </ul>
             </div>

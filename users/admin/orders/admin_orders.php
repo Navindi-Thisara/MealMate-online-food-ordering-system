@@ -740,10 +740,10 @@ $page_title = "Orders Dashboard - MealMate Admin";
             <h1 class="nav-logo">MealMate</h1>
             <ul class="nav-menu">
                 <li><a href="/MealMate-online-food-ordering-system/index.php">Home</a></li>
-                <li><a href="../../../admin/admin_dashboard.php">Dashboard</a></li>
-                <li><a href="../../../food_management/manage_food.php">Manage Food</a></li>
+                <li><a href="../../../users/admin/admin_dashboard.php">Dashboard</a></li>
+                <li><a href="../../../users/admin/manage_food.php">Manage Food</a></li>
                 <li><a href="/MealMate-online-food-ordering-system/users/admin/orders/admin_orders.php" class="active">Manage Orders</a></li>
-                <li><a href="../../../admin/manage_users.php">Manage Users</a></li>
+                <li><a href="../../../users/admin/manage_users.php">Manage Users</a></li>
                 <li><a href="../../../users/logout.php">Logout</a></li>
             </ul>
         </div>
