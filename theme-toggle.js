@@ -4,6 +4,8 @@
 (function() {
     'use strict';
 
+    console.log('MealMate theme-toggle.js loaded');
+
     // Helper: read a cookie by name
     const readCookie = (name) => {
         const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.*+?^${}()|[\]\\])/g, '\\$1') + '=([^;]*)'));
@@ -19,25 +21,26 @@
     const setTheme = (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('mealmate-theme', theme);
-        // persist in cookie for server-side rendering (1 year)
         try {
             document.cookie = 'mealmate-theme=' + encodeURIComponent(theme) + ';path=/;max-age=' + (60*60*24*365) + ';SameSite=Lax';
         } catch (e) { /* no-op */ }
 
-        // update meta theme-color for mobile UI
         const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) {
-            meta.setAttribute('content', theme === 'light' ? '#fafafa' : '#0d0d0d');
-        }
+        if (meta) meta.setAttribute('content', theme === 'light' ? '#fafafa' : '#0d0d0d');
 
-        // Update button icon
         updateThemeIcon(theme);
 
-        // Dispatch custom event for other scripts
+        const btn = document.querySelector('.theme-toggle-btn');
+        if (btn) {
+            try {
+                btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+                btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+            } catch (e) { /* no-op */ }
+        }
+
         window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
     };
 
-    // Update the theme toggle button icon
     const updateThemeIcon = (theme) => {
         const sunIcon = document.querySelector('.sun-icon');
         const moonIcon = document.querySelector('.moon-icon');
@@ -57,110 +60,142 @@
         }
     };
 
-    // Toggle between themes
+    // guard to avoid double-triggering rapid toggles
+    let toggleLock = false;
     const toggleTheme = () => {
+        if (toggleLock) {
+            console.debug('toggleTheme: locked, ignoring duplicate event');
+            return;
+        }
+        toggleLock = true;
+        setTimeout(() => { toggleLock = false; }, 350); // small debounce window
+
         const currentTheme = getCurrentTheme();
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         setTheme(newTheme);
 
-        // Add animation effect
         animateThemeChange();
     };
 
-    // Add visual feedback when theme changes
     const animateThemeChange = () => {
         const btn = document.querySelector('.theme-toggle-btn');
         if (btn) {
             btn.style.transform = 'scale(1.2) rotate(360deg)';
-            setTimeout(() => {
-                btn.style.transform = '';
-            }, 300);
+            setTimeout(() => { btn.style.transform = ''; }, 300);
         }
     };
 
-    // Initialize theme on page load
     const initTheme = () => {
         const theme = getCurrentTheme();
         setTheme(theme);
         console.log('Theme initialized:', theme);
     };
 
-    // Create and inject the theme toggle button
     const createThemeToggleButton = () => {
-        // Check if button already exists
-        if (document.querySelector('.theme-toggle-container')) {
+        const attachListeners = (btn) => {
+            if (!btn) return;
+            if (btn.dataset.themeListenerAttached) return;
+
+            if (!btn.hasAttribute('type')) {
+                try { btn.setAttribute('type', 'button'); } catch (e) { /* ignore */ }
+            }
+
+            // Keep per-button listeners minimal (keyboard support) — click handled by delegation below
+            btn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleTheme();
+                }
+            });
+
+            try {
+                const pressed = getCurrentTheme() === 'light' ? 'true' : 'false';
+                btn.setAttribute('aria-pressed', pressed);
+                btn.setAttribute('aria-label', getCurrentTheme() === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+            } catch (e) { /* no-op */ }
+
+            btn.dataset.themeListenerAttached = '1';
+        };
+
+        let container = document.querySelector('.theme-toggle-container');
+        if (container) {
+            let btn = container.querySelector('.theme-toggle-btn') || document.querySelector('.theme-toggle-btn');
+            attachListeners(btn);
             return;
         }
 
-        const container = document.createElement('div');
+        container = document.createElement('div');
         container.className = 'theme-toggle-container';
         container.innerHTML = `
-            <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
+            <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme" type="button">
                 <i class="fas fa-sun theme-icon sun-icon"></i>
                 <i class="fas fa-moon theme-icon moon-icon"></i>
             </button>
         `;
-
         document.body.appendChild(container);
 
-        // Add click event listener
         const btn = container.querySelector('.theme-toggle-btn');
-        btn.addEventListener('click', toggleTheme);
+        attachListeners(btn);
+    };
 
-        // Add keyboard support
-        btn.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+    // Delegated click/keydown handlers so clicks always register even if button added later
+    const delegateHandlers = () => {
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest && e.target.closest('.theme-toggle-btn');
+            if (target) {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            const target = e.target.closest && e.target.closest('.theme-toggle-btn');
+            if (target && (e.key === 'Enter' || e.key === ' ')) {
                 e.preventDefault();
                 toggleTheme();
             }
         });
     };
 
-    // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
             createThemeToggleButton();
+            delegateHandlers();
         });
     } else {
         initTheme();
         createThemeToggleButton();
+        delegateHandlers();
     }
 
-    // Re-apply theme if page is shown from cache (e.g., browser back button)
     window.addEventListener('pageshow', (event) => {
-        if (event.persisted) {
-            initTheme();
-        }
+        if (event.persisted) initTheme();
     });
 
-    // Expose theme functions to global scope for external use
     window.MealMateTheme = {
         toggle: toggleTheme,
         setTheme: setTheme,
         getTheme: getCurrentTheme
     };
 
-})();
+})(); // end IIFE
 
-// Add smooth scroll behavior for theme transitions
 document.addEventListener('themechange', (e) => {
     console.log('Theme changed to:', e.detail.theme);
-
-    // You can add custom logic here when theme changes
-    // For example, update charts, images, etc.
 });
 
-// Detect system theme preference changes
 if (window.matchMedia) {
     const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
     darkModeQuery.addEventListener('change', (e) => {
-        // Only auto-switch if user hasn't manually set a preference
         const hasManualPreference = localStorage.getItem('mealmate-theme') || (document.cookie && document.cookie.indexOf('mealmate-theme=') !== -1);
         if (!hasManualPreference) {
             const newTheme = e.matches ? 'dark' : 'light';
-            window.MealMateTheme.setTheme(newTheme);
+            if (window.MealMateTheme && typeof window.MealMateTheme.setTheme === 'function') {
+                window.MealMateTheme.setTheme(newTheme);
+            } else {
+                try { document.documentElement.setAttribute('data-theme', newTheme); } catch (err) {}
+            }
         }
     });
 }
