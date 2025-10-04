@@ -80,6 +80,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .error { color: red; font-size: 13px; display: none; margin-top: 2px; }
     input:invalid, textarea:invalid { border: 1px solid red; }
     button:disabled { background: #ccc; cursor: not-allowed; }
+
+     footer {
+        color: #fff;
+        background: black;
+        text-align: center;
+        padding: 15px 0;
+        font-size: 14px;
+    }
 </style>
 <?php if ($redirect_to_login): ?>
 <meta http-equiv="refresh" content="3;url=login.php">
