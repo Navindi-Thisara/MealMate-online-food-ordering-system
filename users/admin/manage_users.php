@@ -34,6 +34,39 @@ if ($result && $result->num_rows > 0) {
     <link rel="stylesheet" href="../assets/form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* === CSS Variables for Theme === */
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222;
+            --bg-header: rgba(0, 0, 0, 0.8);
+            --text-primary: #fff;
+            --text-secondary: #ddd;
+            --text-muted: #ccc;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF6B35;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.3);
+            --footer-bg: rgba(0, 0, 0, 0.9);
+            --footer-border: #333;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f0f0f0;
+            --bg-card: #fff;
+            --bg-header: rgba(255, 255, 255, 0.98);
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #555;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF3300;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.25);
+            --footer-bg: #f8f8f8;
+            --footer-border: #ddd;
+        }
+
         /* === Global & Navbar Styles from admin_dashboard.php === */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
@@ -45,20 +78,21 @@ if ($result && $result->num_rows > 0) {
 
         body {
             font-family: 'Poppins', sans-serif;
-            color: #fff;
+            color: var(--text-primary);
             scroll-behavior: smooth;
-            background-color: #0d0d0d;
+            background-color: var(--bg-primary);
             overflow-x: hidden;
             position: relative;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .navbar {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: var(--bg-header);
             backdrop-filter: blur(10px);
-            border-bottom: 2px solid #FF4500;
+            border-bottom: 2px solid var(--border-color);
             padding: 20px 50px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             z-index: 20;
@@ -81,11 +115,15 @@ if ($result && $result->num_rows > 0) {
         }
 
         .nav-logo {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 32px;
             font-weight: 700;
             margin: 0;
             text-shadow: 3px 3px 6px #000;
+        }
+
+        [data-theme="light"] .nav-logo {
+            text-shadow: 2px 2px 4px rgba(255, 69, 0, 0.2);
         }
 
         .nav-menu {
@@ -96,7 +134,7 @@ if ($result && $result->num_rows > 0) {
         }
 
         .nav-menu a {
-            color: #fff;
+            color: var(--text-primary);
             text-decoration: none;
             font-size: 18px;
             font-weight: 400;
@@ -113,13 +151,13 @@ if ($result && $result->num_rows > 0) {
             left: 0;
             width: 0;
             height: 2px;
-            background: #FF4500;
+            background: var(--accent-primary);
             transition: width 0.3s ease;
         }
 
         .nav-menu a:hover,
         .nav-menu a.active {
-            color: #FF4500;
+            color: var(--accent-primary);
         }
 
         .nav-menu a:hover::after,
@@ -143,14 +181,14 @@ if ($result && $result->num_rows > 0) {
         }
 
         .header h2 {
-            color: #ff4500;
+            color: var(--accent-primary);
             font-size: 2rem;
             font-weight: bold;
             margin-bottom: 0.5rem;
         }
 
         .header p {
-            color: #ccc;
+            color: var(--text-secondary);
             font-size: 1.1rem;
             /* Adjusted for a larger gap */
             margin-bottom: 2rem;
@@ -164,42 +202,43 @@ if ($result && $result->num_rows > 0) {
             right: 0;
             width: 100vw;
             height: 2px;
-            background-color: #ff4500;
+            background-color: var(--accent-primary);
             margin-left: calc(-50vw + 50%);
         }
 
         .search-container {
             padding: 8px 10px;
-            background: rgba(20,20,20,0.95);
+            background: var(--bg-card);
             position: sticky;
             top: 72px; /* Adjusted to be below the navbar */
             z-index: 10; /* Set z-index to make sure it's on top */
-            border-bottom: 2px solid #FF4500;
-            border-top: 2px solid #FF4500;
+            border-bottom: 2px solid var(--border-color);
+            border-top: 2px solid var(--border-color);
         }
 
         .search-container input {
             padding: 8px 12px;
             border-radius: 5px;
-            border: 1px solid #FF4500;
+            border: 1px solid var(--border-color);
             width: 250px;
-            background: #111;
-            color: #fff;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
             transition: all 0.3s ease;
         }
 
         .search-container input:focus {
             outline: none;
-            border-color: #ff4500;
-            box-shadow: 0 0 10px #ff4500;
+            border-color: var(--accent-hover);
+            box-shadow: 0 0 10px var(--shadow-color);
+            background: var(--bg-card);
         }
 
         /* Removed max-height and overflow-y from this container to allow the body to scroll */
         .user-table-container {
-            background: rgba(20, 20, 20, 0.95);
+            background: var(--bg-card);
             border-radius: 12px;
-            border: 2px solid #FF4500;
-            box-shadow: 0 4px 20px rgba(255, 69, 0, 0.5);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 20px var(--shadow-color);
             /* Increased margin for the gap as requested */
             margin-top: 40px; 
             margin-bottom: 40px;
@@ -208,7 +247,7 @@ if ($result && $result->num_rows > 0) {
         .user-table {
             width: 100%;
             border-collapse: collapse;
-            color: #e0e0e0;
+            color: var(--text-secondary);
             min-width: 900px;
         }
 
@@ -220,7 +259,7 @@ if ($result && $result->num_rows > 0) {
         }
 
         .user-table th {
-            background-color: #ff4500;
+            background-color: var(--accent-primary);
             color: #000;
             font-weight: bold;
             text-transform: uppercase;
@@ -232,11 +271,11 @@ if ($result && $result->num_rows > 0) {
         }
 
         .user-table tr:nth-child(even) {
-            background-color: #111;
+            background-color: var(--bg-secondary);
         }
 
         .user-table tr:hover {
-            background-color: #222;
+            background-color: var(--bg-header);
         }
 
         .user-table .actions {
@@ -247,7 +286,7 @@ if ($result && $result->num_rows > 0) {
         }
 
         .user-table .actions a {
-            color: #fff;
+            color: var(--text-primary);
             font-size: 1.2rem;
             transition: color 0.3s;
         }
@@ -275,9 +314,9 @@ if ($result && $result->num_rows > 0) {
         }
 
         .modal-content {
-            background-color: #222;
+            background-color: var(--bg-card);
             padding: 30px;
-            border: 2px solid #ff4500;
+            border: 2px solid var(--accent-primary);
             border-radius: 10px;
             width: 80%;
             max-width: 400px;
@@ -287,7 +326,7 @@ if ($result && $result->num_rows > 0) {
 
         .modal-content h3 {
             margin-top: 0;
-            color: #ff4500;
+            color: var(--accent-primary);
         }
 
         .modal-buttons {
@@ -326,8 +365,8 @@ if ($result && $result->num_rows > 0) {
         
         /* === Footer styles for the copyright text === */
         .simple-footer {
-            background-color: #0d0d0d;
-            color: #fff;
+            background-color: var(--footer-bg);
+            color: var(--text-primary);
             padding: 10px 0;
             text-align: center;
             font-family: 'Poppins', sans-serif;
@@ -335,6 +374,7 @@ if ($result && $result->num_rows > 0) {
             position: relative;
             width: 100%;
             margin-top: auto;
+            border-top: 2px solid var(--border-color);
         }
         
         .simple-footer::before {
@@ -344,7 +384,99 @@ if ($result && $result->num_rows > 0) {
             left: 0;
             width: 100%;
             height: 2px;
-            background-color: #FF4500;
+            background-color: var(--accent-primary);
+        }
+
+        /* === Theme Toggle Button === */
+        .theme-toggle-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .theme-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 12px 35px var(--shadow-color);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-toggle-btn .theme-icon {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-btn .sun-icon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0);
+        }
+
+        .theme-toggle-btn .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .sun-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .moon-icon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0);
+        }
+
+        /* Autofill and focus fix */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        [data-theme="light"] .search-container input {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        [data-theme="light"] .search-container input::placeholder {
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .theme-toggle-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .theme-toggle-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -421,10 +553,19 @@ if ($result && $result->num_rows > 0) {
         </div>
     </div>
 
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
+            <i class="fas fa-sun theme-icon sun-icon"></i>
+            <i class="fas fa-moon theme-icon moon-icon"></i>
+        </button>
+    </div>
+
     <div class="simple-footer">
         &copy; 2025 MealMate. All rights reserved.
     </div>
 
+    <script src="/MealMate-online-food-ordering-system/theme-toggle.js"></script>
     <script>
         // Delete modal
         let userIdToDelete = null;

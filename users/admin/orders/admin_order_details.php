@@ -36,6 +36,39 @@ $page_title = "Order Details - Admin - MealMate";
     <title><?php echo $page_title; ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* === CSS Variables for Theme === */
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222;
+            --bg-header: rgba(0, 0, 0, 0.8);
+            --text-primary: #fff;
+            --text-secondary: #ddd;
+            --text-muted: #ccc;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF6B35;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.3);
+            --footer-bg: rgba(0, 0, 0, 0.9);
+            --footer-border: #333;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f0f0f0;
+            --bg-card: #fff;
+            --bg-header: rgba(255, 255, 255, 0.98);
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #555;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF3300;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.25);
+            --footer-bg: #f8f8f8;
+            --footer-border: #ddd;
+        }
+
         /* === Global Styles === */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
@@ -47,18 +80,22 @@ $page_title = "Order Details - Admin - MealMate";
 
         body {
             font-family: 'Poppins', sans-serif;
-            color: #fff;
+            color: var(--text-primary);
             scroll-behavior: smooth;
-            background-color: #0d0d0d;
+            background-color: var(--bg-primary);
             overflow-x: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* === Navbar Styles === */
         .navbar {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: var(--bg-header);
             backdrop-filter: blur(10px);
-            border-bottom: 2px solid #FF4500;
+            border-bottom: 2px solid var(--border-color);
             padding: 20px 50px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             z-index: 20;
@@ -81,11 +118,15 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .nav-logo {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 32px;
             font-weight: 700;
             margin: 0;
             text-shadow: 3px 3px 6px #000;
+        }
+
+        [data-theme="light"] .nav-logo {
+            text-shadow: 2px 2px 4px rgba(255, 69, 0, 0.2);
         }
 
         .nav-menu {
@@ -96,7 +137,7 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .nav-menu a {
-            color: #fff;
+            color: var(--text-primary);
             text-decoration: none;
             font-size: 18px;
             font-weight: 400;
@@ -113,13 +154,13 @@ $page_title = "Order Details - Admin - MealMate";
             left: 0;
             width: 0;
             height: 2px;
-            background: #FF4500;
+            background: var(--accent-primary);
             transition: width 0.3s ease;
         }
 
         .nav-menu a:hover,
         .nav-menu a.active {
-            color: #FF4500;
+            color: var(--accent-primary);
         }
 
         .nav-menu a:hover::after,
@@ -133,6 +174,7 @@ $page_title = "Order Details - Admin - MealMate";
             padding-top: 80px;
             width: 100%;
             overflow-x: hidden;
+            flex: 1;
         }
 
         .content {
@@ -140,6 +182,7 @@ $page_title = "Order Details - Admin - MealMate";
             max-width: 1400px;
             margin: 120px auto 2rem auto;
             padding: 0 50px;
+            flex: 1;
         }
 
         .page-header {
@@ -151,7 +194,7 @@ $page_title = "Order Details - Admin - MealMate";
 
         .page-header h1 {
             font-size: 2.5rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0;
             font-weight: 700;
         }
@@ -164,7 +207,7 @@ $page_title = "Order Details - Admin - MealMate";
             right: 0;
             width: 100vw;
             height: 2px;
-            background-color: #ff4500;
+            background-color: var(--accent-primary);
             margin-left: calc(-50vw + 50%);
         }
 
@@ -177,7 +220,7 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .breadcrumb a {
-            color: #FF4500;
+            color: var(--accent-primary);
             text-decoration: none;
         }
 
@@ -186,7 +229,7 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .breadcrumb span {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(var(--text-primary), 0.6);
         }
 
         .order-details-container {
@@ -209,19 +252,19 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .card {
-            background: rgba(20,20,20,0.95);
+            background: var(--bg-card);
             border-radius: 12px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 2rem;
-            box-shadow: 0 4px 20px rgba(255,69,0,0.5);
+            box-shadow: 0 4px 20px var(--shadow-color);
         }
 
         .card-title {
             font-size: 1.5rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0 0 1.5rem;
             font-weight: 700;
-            border-bottom: 2px solid rgba(255, 69, 0, 0.3);
+            border-bottom: 2px solid rgba(var(--accent-primary), 0.3);
             padding-bottom: 0.5rem;
         }
 
@@ -243,7 +286,7 @@ $page_title = "Order Details - Admin - MealMate";
 
         .order-number {
             font-size: 1.8rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 700;
         }
 
@@ -319,14 +362,14 @@ $page_title = "Order Details - Admin - MealMate";
             align-items: center;
             gap: 1.5rem;
             padding: 1.5rem;
-            background: rgba(255, 69, 0, 0.05);
+            background: rgba(var(--accent-primary), 0.05);
             border-radius: 12px;
-            border: 1px solid rgba(255, 69, 0, 0.2);
+            border: 1px solid rgba(var(--accent-primary), 0.2);
             transition: all 0.3s ease;
         }
 
         .order-item:hover {
-            background: rgba(255, 69, 0, 0.1);
+            background: rgba(var(--accent-primary), 0.1);
             transform: translateY(-2px);
         }
 
@@ -335,12 +378,12 @@ $page_title = "Order Details - Admin - MealMate";
             height: 80px;
             border-radius: 12px;
             overflow: hidden;
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.25);
+            box-shadow: 0 4px 12px rgba(var(--accent-primary), 0.25);
         }
 
         .item-image img {
@@ -355,13 +398,13 @@ $page_title = "Order Details - Admin - MealMate";
 
         .item-name {
             font-size: 1.3rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0 0 0.5rem;
             font-weight: 600;
         }
 
         .item-description {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(var(--text-primary), 0.8);
             font-size: 0.95rem;
             margin-bottom: 0.5rem;
         }
@@ -373,12 +416,12 @@ $page_title = "Order Details - Admin - MealMate";
 
         .item-quantity {
             text-align: center;
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 600;
-            background: rgba(255, 69, 0, 0.1);
+            background: rgba(var(--accent-primary), 0.1);
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            border: 1px solid rgba(255, 69, 0, 0.3);
+            border: 1px solid rgba(var(--accent-primary), 0.3);
             min-width: 60px;
         }
 
@@ -409,9 +452,9 @@ $page_title = "Order Details - Admin - MealMate";
             top: 0.5rem;
             width: 12px;
             height: 12px;
-            background: #FF4500;
+            background: var(--accent-primary);
             border-radius: 50%;
-            border: 3px solid #000;
+            border: 3px solid var(--bg-primary);
         }
 
         .timeline-item:after {
@@ -421,7 +464,7 @@ $page_title = "Order Details - Admin - MealMate";
             top: 1.5rem;
             width: 2px;
             height: calc(100% + 1rem);
-            background: linear-gradient(180deg, #FF4500, rgba(255, 69, 0, 0.3));
+            background: linear-gradient(180deg, var(--accent-primary), rgba(var(--accent-primary), 0.3));
         }
 
         .timeline-item:last-child:after {
@@ -434,13 +477,13 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .timeline-content h4 {
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0 0 0.5rem;
             font-size: 1.1rem;
         }
 
         .timeline-content .time {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(var(--text-primary), 0.6);
             font-size: 0.9rem;
         }
 
@@ -455,7 +498,7 @@ $page_title = "Order Details - Admin - MealMate";
             justify-content: space-between;
             align-items: flex-start;
             padding: 0.8rem 0;
-            border-bottom: 1px solid rgba(255, 69, 0, 0.2);
+            border-bottom: 1px solid rgba(var(--accent-primary), 0.2);
         }
 
         .info-item:last-child {
@@ -463,20 +506,20 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .info-label {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 600;
             min-width: 120px;
         }
 
         .info-value {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(var(--text-primary), 0.9);
             text-align: right;
             flex: 1;
         }
 
         /* Order Totals */
         .totals-section {
-            border-top: 2px dashed rgba(255, 69, 0, 0.3);
+            border-top: 2px dashed rgba(var(--accent-primary), 0.3);
             padding-top: 1.5rem;
             margin-top: 1.5rem;
         }
@@ -493,7 +536,7 @@ $page_title = "Order Details - Admin - MealMate";
             font-size: 1.4rem;
             font-weight: bold;
             color: #FFD700;
-            border-top: 2px solid rgba(255, 69, 0, 0.3);
+            border-top: 2px solid rgba(var(--accent-primary), 0.3);
             padding-top: 1rem;
             margin-top: 1rem;
         }
@@ -521,15 +564,15 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .btn-primary {
-            background: #ff4500;
+            background: var(--accent-primary);
             color: #000;
-            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
+            box-shadow: 0 4px 12px rgba(var(--accent-primary), 0.35);
         }
 
         .btn-primary:hover {
-            background: #e65c00;
+            background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(255, 69, 0, 0.5);
+            box-shadow: 0 6px 18px rgba(var(--accent-primary), 0.5);
         }
 
         .btn-secondary {
@@ -581,14 +624,14 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .modal-content {
-            background: #222;
+            background: var(--bg-card);
             margin: 10% auto;
             padding: 2rem;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--accent-primary);
             border-radius: 15px;
             width: 90%;
             max-width: 500px;
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .modal-header {
@@ -599,14 +642,14 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .modal-title {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 1.5rem;
             font-weight: 700;
             margin: 0;
         }
 
         .close {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 2rem;
             font-weight: bold;
             cursor: pointer;
@@ -614,7 +657,7 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .close:hover {
-            color: #FF6B35;
+            color: var(--accent-hover);
         }
 
         .filter-group {
@@ -624,16 +667,16 @@ $page_title = "Order Details - Admin - MealMate";
         }
 
         .filter-group label {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 600;
             font-size: 1rem;
         }
 
         .filter-input,
         .filter-select {
-            background: #000;
-            border: 2px solid #FF4500;
-            color: #fff;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            color: var(--text-primary);
             padding: 0.8rem;
             border-radius: 8px;
             font-size: 1rem;
@@ -643,21 +686,22 @@ $page_title = "Order Details - Admin - MealMate";
         .filter-input:focus,
         .filter-select:focus {
             outline: none;
-            border-color: #FF6B35;
-            box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.2);
+            border-color: var(--accent-hover);
+            box-shadow: 0 0 0 3px rgba(var(--accent-primary), 0.2);
         }
 
         /* === Footer Styles === */
         .simple-footer {
-            background-color: #0d0d0d;
-            color: #fff;
+            background-color: var(--footer-bg);
+            color: var(--text-primary);
             padding: 20px 0;
             text-align: center;
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
             position: relative;
             width: 100%;
-            margin-top: 3rem;
+            margin-top: auto;
+            border-top: 2px solid var(--border-color);
         }
 
         .simple-footer::before {
@@ -667,7 +711,77 @@ $page_title = "Order Details - Admin - MealMate";
             left: 0;
             width: 100%;
             height: 2px;
-            background-color: #FF4500;
+            background-color: var(--accent-primary);
+        }
+
+        /* === Theme Toggle Button === */
+        .theme-toggle-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .theme-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 12px 35px var(--shadow-color);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-toggle-btn .theme-icon {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-btn .sun-icon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0);
+        }
+
+        .theme-toggle-btn .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .sun-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .moon-icon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0);
+        }
+
+        /* Autofill and focus fix */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
 
         /* Responsive Design */
@@ -748,6 +862,17 @@ $page_title = "Order Details - Admin - MealMate";
 
             .timeline-item:after {
                 left: -1rem;
+            }
+
+            .theme-toggle-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .theme-toggle-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
         }
 
@@ -832,7 +957,7 @@ $page_title = "Order Details - Admin - MealMate";
                             <div class="order-info">
                                 <div class="order-number">#<?php echo htmlspecialchars($order['order_number']); ?></div>
                                 <div class="customer-info">Customer: <?php echo htmlspecialchars($order['full_name']); ?></div>
-                                <p style="color: rgba(255, 255, 255, 0.7); margin: 0.5rem 0;">
+                                <p style="color: rgba(var(--text-primary), 0.7); margin: 0.5rem 0;">
                                     Placed on <?php echo date('M d, Y \a\t g:i A', strtotime($order['created_at'])); ?>
                                 </p>
                             </div>
@@ -997,7 +1122,7 @@ $page_title = "Order Details - Admin - MealMate";
                                             <?php echo date('M d, Y \a\t g:i A', strtotime($status['created_at'])); ?>
                                         </div>
                                         <?php if (!empty($status['change_reason'])): ?>
-                                            <p style="color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem; font-size: 0.9rem;">
+                                            <p style="color: rgba(var(--text-primary), 0.7); margin-top: 0.5rem; font-size: 0.9rem;">
                                                 <?php echo htmlspecialchars($status['change_reason']); ?>
                                             </p>
                                         <?php endif; ?>
@@ -1111,10 +1236,19 @@ $page_title = "Order Details - Admin - MealMate";
         </div>
     </div>
 
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
+            <i class="fas fa-sun theme-icon sun-icon"></i>
+            <i class="fas fa-moon theme-icon moon-icon"></i>
+        </button>
+    </div>
+
     <div class="simple-footer">
         &copy; <?= date('Y') ?> MealMate. All rights reserved.
     </div>
 
+    <script src="/MealMate-online-food-ordering-system/theme-toggle.js"></script>
     <script>
         function updateOrderStatus(orderId, currentStatus) {
             document.getElementById('orderId').value = orderId;

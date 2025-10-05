@@ -1,43 +1,42 @@
 // Theme Toggle System for MealMate
-// This file handles dark/light mode switching with localStorage persistence
+// Simplified and reliable version
 
 (function() {
     'use strict';
 
-    // Helper: read a cookie by name
-    const readCookie = (name) => {
-        const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.*+?^${}()|[\]\\])/g, '\\$1') + '=([^;]*)'));
-        return match ? decodeURIComponent(match[1]) : null;
-    };
+    console.log('MealMate theme-toggle.js loaded');
 
-    // Get the current theme from localStorage or cookie or default to 'dark'
+    // Get the current theme from localStorage or default to 'dark'
     const getCurrentTheme = () => {
-        return localStorage.getItem('mealmate-theme') || readCookie('mealmate-theme') || 'dark';
+        return localStorage.getItem('mealmate-theme') || 'dark';
     };
 
     // Set theme on the document
     const setTheme = (theme) => {
+        console.log('Setting theme to:', theme);
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('mealmate-theme', theme);
-        // persist in cookie for server-side rendering (1 year)
-        try {
-            document.cookie = 'mealmate-theme=' + encodeURIComponent(theme) + ';path=/;max-age=' + (60*60*24*365) + ';SameSite=Lax';
-        } catch (e) { /* no-op */ }
-
-        // update meta theme-color for mobile UI
+        
+        // Update theme-color meta tag
         const meta = document.querySelector('meta[name="theme-color"]');
         if (meta) {
             meta.setAttribute('content', theme === 'light' ? '#fafafa' : '#0d0d0d');
         }
 
-        // Update button icon
+        // Update icons
         updateThemeIcon(theme);
 
-        // Dispatch custom event for other scripts
+        // Update button attributes
+        const btn = document.querySelector('.theme-toggle-btn');
+        if (btn) {
+            btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+            btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+        }
+
+        // Dispatch custom event
         window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
     };
 
-    // Update the theme toggle button icon
     const updateThemeIcon = (theme) => {
         const sunIcon = document.querySelector('.sun-icon');
         const moonIcon = document.querySelector('.moon-icon');
@@ -57,110 +56,97 @@
         }
     };
 
-    // Toggle between themes
+    // Toggle theme function
     const toggleTheme = () => {
+        console.log('Toggle theme called');
         const currentTheme = getCurrentTheme();
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         setTheme(newTheme);
-
-        // Add animation effect
-        animateThemeChange();
-    };
-
-    // Add visual feedback when theme changes
-    const animateThemeChange = () => {
+        
+        // Animate button
         const btn = document.querySelector('.theme-toggle-btn');
         if (btn) {
             btn.style.transform = 'scale(1.2) rotate(360deg)';
-            setTimeout(() => {
-                btn.style.transform = '';
-            }, 300);
+            setTimeout(() => { btn.style.transform = ''; }, 300);
         }
     };
 
-    // Initialize theme on page load
+    // Initialize theme
     const initTheme = () => {
         const theme = getCurrentTheme();
         setTheme(theme);
         console.log('Theme initialized:', theme);
     };
 
-    // Create and inject the theme toggle button
-    const createThemeToggleButton = () => {
-        // Check if button already exists
-        if (document.querySelector('.theme-toggle-container')) {
-            return;
-        }
-
-        const container = document.createElement('div');
-        container.className = 'theme-toggle-container';
-        container.innerHTML = `
-            <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
-                <i class="fas fa-sun theme-icon sun-icon"></i>
-                <i class="fas fa-moon theme-icon moon-icon"></i>
-            </button>
-        `;
-
-        document.body.appendChild(container);
-
-        // Add click event listener
-        const btn = container.querySelector('.theme-toggle-btn');
-        btn.addEventListener('click', toggleTheme);
-
-        // Add keyboard support
-        btn.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+    // Attach click handlers to all theme toggle buttons
+    const attachClickHandlers = () => {
+        const buttons = document.querySelectorAll('.theme-toggle-btn');
+        console.log('Found', buttons.length, 'theme toggle button(s)');
+        
+        buttons.forEach((btn, index) => {
+            // Remove any existing listeners by cloning
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            // Add fresh click listener
+            newBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                console.log('Button clicked - Button', index + 1);
                 toggleTheme();
-            }
+            });
+            
+            // Add keyboard support
+            newBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    console.log('Button activated via keyboard');
+                    toggleTheme();
+                }
+            });
+            
+            console.log('Click handler attached to button', index + 1);
         });
     };
 
     // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            createThemeToggleButton();
-        });
-    } else {
+    const init = () => {
         initTheme();
-        createThemeToggleButton();
+        attachClickHandlers();
+        
+        // Re-attach handlers after a short delay to catch dynamically added buttons
+        setTimeout(() => {
+            attachClickHandlers();
+        }, 500);
+    };
+
+    // Run initialization
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
 
-    // Re-apply theme if page is shown from cache (e.g., browser back button)
+    // Handle back/forward cache
     window.addEventListener('pageshow', (event) => {
         if (event.persisted) {
             initTheme();
+            attachClickHandlers();
         }
     });
 
-    // Expose theme functions to global scope for external use
+    // Expose public API
     window.MealMateTheme = {
         toggle: toggleTheme,
         setTheme: setTheme,
         getTheme: getCurrentTheme
     };
 
+    console.log('Theme toggle system ready');
+
 })();
 
-// Add smooth scroll behavior for theme transitions
+// Listen for theme changes
 document.addEventListener('themechange', (e) => {
     console.log('Theme changed to:', e.detail.theme);
-
-    // You can add custom logic here when theme changes
-    // For example, update charts, images, etc.
 });
-
-// Detect system theme preference changes
-if (window.matchMedia) {
-    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    darkModeQuery.addEventListener('change', (e) => {
-        // Only auto-switch if user hasn't manually set a preference
-        const hasManualPreference = localStorage.getItem('mealmate-theme') || (document.cookie && document.cookie.indexOf('mealmate-theme=') !== -1);
-        if (!hasManualPreference) {
-            const newTheme = e.matches ? 'dark' : 'light';
-            window.MealMateTheme.setTheme(newTheme);
-        }
-    });
-}

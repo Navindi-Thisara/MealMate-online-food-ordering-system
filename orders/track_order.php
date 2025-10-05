@@ -46,19 +46,46 @@ include '../includes/menu_header.php';
     <title><?php echo $page_title; ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Track Order Page Styling */
+        /* === CSS Variables for Theme === */
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222;
+            --text-primary: #fff;
+            --text-secondary: #ddd;
+            --text-muted: #ccc;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF6B35;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f0f0f0;
+            --bg-card: #fff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #555;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF3300;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.25);
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
-            background-color: #000;
-            color: #fff;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
             font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .main-container {
@@ -83,14 +110,14 @@ include '../includes/menu_header.php';
 
         .page-header h1 {
             font-size: 2.5rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0;
             font-weight: 700;
         }
 
         .page-header p {
             font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-secondary);
             margin: 1rem 0;
         }
 
@@ -103,7 +130,7 @@ include '../includes/menu_header.php';
         }
 
         .breadcrumb a {
-            color: #FF4500;
+            color: var(--accent-primary);
             text-decoration: none;
         }
 
@@ -112,17 +139,17 @@ include '../includes/menu_header.php';
         }
 
         .breadcrumb span {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-muted);
         }
 
         /* Order Info Card */
         .order-info-card {
-            background: linear-gradient(135deg, #111, #1a1a1a);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
             border-radius: 15px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
 
         .order-summary {
@@ -135,7 +162,7 @@ include '../includes/menu_header.php';
 
         .order-number {
             font-size: 1.8rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 700;
         }
 
@@ -171,24 +198,24 @@ include '../includes/menu_header.php';
 
         .status-out_for_delivery {
             background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 107, 53, 0.1));
-            color: #FF6B35;
+            color: var(--accent-hover);
             border: 1px solid rgba(255, 107, 53, 0.5);
         }
 
         /* Progress Tracker */
         .progress-tracker {
-            background: linear-gradient(135deg, #111, #1a1a1a);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
             border-radius: 15px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 2.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
 
         .tracker-title {
             text-align: center;
             font-size: 1.8rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin-bottom: 2rem;
             font-weight: 700;
         }
@@ -214,7 +241,7 @@ include '../includes/menu_header.php';
 
         .progress-line-fill {
             height: 100%;
-            background: linear-gradient(90deg, #FF4500, #FF6B35);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-hover));
             border-radius: 2px;
             transition: width 0.8s ease;
         }
@@ -225,7 +252,7 @@ include '../includes/menu_header.php';
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #000;
+            background: var(--bg-primary);
             padding: 1rem;
             border-radius: 50%;
             min-width: 100px;
@@ -252,7 +279,7 @@ include '../includes/menu_header.php';
         }
 
         .step-circle.active {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
             color: #000;
             box-shadow: 0 0 20px rgba(255, 69, 0, 0.6);
             animation: pulse 2s infinite;
@@ -261,7 +288,13 @@ include '../includes/menu_header.php';
         .step-circle.pending {
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-muted);
+        }
+
+        [data-theme="light"] .step-circle.pending {
+            background: rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            color: var(--text-muted);
         }
 
         @keyframes pulse {
@@ -281,27 +314,27 @@ include '../includes/menu_header.php';
         }
 
         .step-label.active {
-            color: #FF4500;
+            color: var(--accent-primary);
         }
 
         .step-label.pending {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-muted);
         }
 
         .step-time {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
             margin-top: 0.3rem;
         }
 
         /* Current Status Card */
         .current-status-card {
-            background: linear-gradient(135deg, #111, #1a1a1a);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
             border-radius: 15px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
 
         .status-info {
@@ -311,7 +344,7 @@ include '../includes/menu_header.php';
 
         .status-icon {
             font-size: 4rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin-bottom: 1rem;
             animation: bounce 2s infinite;
         }
@@ -325,14 +358,14 @@ include '../includes/menu_header.php';
 
         .status-message {
             font-size: 1.4rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
 
         .status-description {
             font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-secondary);
             margin-bottom: 2rem;
         }
 
@@ -345,7 +378,7 @@ include '../includes/menu_header.php';
         }
 
         .estimated-time h4 {
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0 0 0.5rem;
             font-size: 1.2rem;
         }
@@ -366,15 +399,15 @@ include '../includes/menu_header.php';
         }
 
         .info-card {
-            background: linear-gradient(135deg, #111, #1a1a1a);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
             border-radius: 15px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 1.5rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
 
         .info-card h3 {
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0 0 1rem;
             font-size: 1.3rem;
             border-bottom: 2px solid rgba(255, 69, 0, 0.3);
@@ -396,13 +429,13 @@ include '../includes/menu_header.php';
         }
 
         .info-label {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 600;
             min-width: 100px;
         }
 
         .info-value {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--text-secondary);
             text-align: right;
             flex: 1;
         }
@@ -431,7 +464,7 @@ include '../includes/menu_header.php';
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
             color: #000;
             box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
         }
@@ -474,6 +507,76 @@ include '../includes/menu_header.php';
             opacity: 1;
         }
 
+        /* Theme Toggle Button */
+        .theme-toggle-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .theme-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 12px 35px var(--shadow-color);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-toggle-btn .theme-icon {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-btn .sun-icon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0);
+        }
+
+        .theme-toggle-btn .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .sun-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .moon-icon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0);
+        }
+
+        /* Autofill and focus fix */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
         /* Responsive Design */
         @media (max-width: 992px) {
             .delivery-info {
@@ -505,6 +608,17 @@ include '../includes/menu_header.php';
                 align-items: center;
                 text-align: center;
                 gap: 1rem;
+            }
+            
+            .theme-toggle-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .theme-toggle-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
         }
 
@@ -626,7 +740,7 @@ include '../includes/menu_header.php';
                 <div class="order-summary">
                     <div>
                         <div class="order-number">#<?php echo htmlspecialchars($order['order_number']); ?></div>
-                        <p style="color: rgba(255, 255, 255, 0.7); margin: 0.5rem 0;">
+                        <p style="color: var(--text-secondary); margin: 0.5rem 0;">
                             Placed on <?php echo date('M d, Y \a\t g:i A', strtotime($order['created_at'])); ?>
                         </p>
                     </div>
@@ -807,7 +921,7 @@ include '../includes/menu_header.php';
                             <span class="info-label">Contact:</span>
                             <span class="info-value">
                                 <a href="tel:<?php echo htmlspecialchars($order['tracking']['delivery_person_phone']); ?>" 
-                                   style="color: #FF4500; text-decoration: none;">
+                                   style="color: var(--accent-primary); text-decoration: none;">
                                     <?php echo htmlspecialchars($order['tracking']['delivery_person_phone']); ?>
                                 </a>
                             </span>
@@ -850,6 +964,17 @@ include '../includes/menu_header.php';
         </div>
     </div>
 
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
+            <i class="fas fa-sun theme-icon sun-icon"></i>
+            <i class="fas fa-moon theme-icon moon-icon"></i>
+        </button>
+    </div>
+
+    <!-- CORRECTED JavaScript Path -->
+    <script src="/MealMate-online-food-ordering-system/theme-toggle.js"></script>
+    
     <script>
         let refreshTimer;
         let isRefreshing = false;

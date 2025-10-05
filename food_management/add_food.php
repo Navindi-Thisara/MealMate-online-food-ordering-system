@@ -1,3 +1,4 @@
+
 <?php
 // Start the session to manage user data
 if (session_status() == PHP_SESSION_NONE) {
@@ -127,6 +128,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Add Food Item - MealMate Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* === CSS Variables for Theme === */
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222;
+            --bg-header: rgba(0, 0, 0, 0.8);
+            --text-primary: #fff;
+            --text-secondary: #ddd;
+            --text-muted: #ccc;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF6B35;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.3);
+            --footer-bg: rgba(0, 0, 0, 0.9);
+            --footer-border: #333;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f0f0f0;
+            --bg-card: #fff;
+            --bg-header: rgba(255, 255, 255, 0.98);
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #555;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF3300;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.25);
+            --footer-bg: #f8f8f8;
+            --footer-border: #ddd;
+        }
+
         /* Shared Styles for Admin Pages */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
@@ -138,17 +172,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body {
             font-family: 'Poppins', sans-serif;
-            color: #fff;
+            color: var(--text-primary);
             scroll-behavior: smooth;
-            background-color: #0d0d0d;
+            background-color: var(--bg-primary);
             overflow-x: hidden;
             position: relative;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .navbar {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: var(--bg-header);
             backdrop-filter: blur(10px);
-            border-bottom: 2px solid #FF4500;
+            border-bottom: 2px solid var(--border-color);
             padding: 20px 50px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             z-index: 20;
@@ -171,11 +206,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .nav-logo {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 32px;
             font-weight: 700;
             margin: 0;
             text-shadow: 3px 3px 6px #000;
+        }
+
+        [data-theme="light"] .nav-logo {
+            text-shadow: 2px 2px 4px rgba(255, 69, 0, 0.2);
         }
 
         .nav-menu {
@@ -186,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .nav-menu a {
-            color: #fff;
+            color: var(--text-primary);
             text-decoration: none;
             font-size: 18px;
             font-weight: 400;
@@ -203,13 +242,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 0;
             width: 0;
             height: 2px;
-            background: #FF4500;
+            background: var(--accent-primary);
             transition: width 0.3s ease;
         }
 
         .nav-menu a:hover,
         .nav-menu a.active {
-            color: #FF4500;
+            color: var(--accent-primary);
         }
 
         .nav-menu a:hover::after,
@@ -227,11 +266,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .form-card {
-            background: rgba(20, 20, 20, 0.95);
+            background: var(--bg-card);
             padding: 40px;
             border-radius: 12px;
-            border: 2px solid #FF4500;
-            box-shadow: 0 4px 20px rgba(255, 69, 0, 0.5);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 20px var(--shadow-color);
             width: 500px;
             max-width: 90%;
             margin: 20px auto;
@@ -240,12 +279,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .form-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(255, 69, 0, 0.7);
+            box-shadow: 0 6px 25px var(--shadow-color);
         }
 
         .form-card h2 {
             text-align: center;
-            color: #ff4500;
+            color: var(--accent-primary);
             font-size: 2em;
             margin-bottom: 20px;
         }
@@ -253,7 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-card label {
             display: block;
             margin-bottom: 5px;
-            color: #ccc;
+            color: var(--text-secondary);
         }
 
         .form-group {
@@ -265,9 +304,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-group select {
             width: 100%;
             padding: 15px;
-            border: 2px solid #ff4500;
-            background-color: #1a1a1a;
-            color: #fff;
+            border: 2px solid var(--accent-primary);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
             border-radius: 8px;
             font-size: 1rem;
             transition: box-shadow 0.3s, transform 0.2s;
@@ -278,7 +317,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             -webkit-appearance: none;
             -moz-appearance: none;
             padding-right: 40px;
-            /* space for custom arrow */
             background-image: url("data:image/svg+xml;utf8,<svg fill='%23ff4500' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
             background-repeat: no-repeat;
             background-position: right 10px center;
@@ -289,28 +327,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
-            box-shadow: 0 0 12px #ff4500;
+            box-shadow: 0 0 12px var(--accent-primary);
             transform: scale(1.01);
         }
 
         input[type="file"] {
             width: 100%;
             padding: 12px;
-            background-color: #1a1a1a;
-            border: 2px solid #ff4500;
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
             border-radius: 8px;
             cursor: pointer;
-            color: #fff;
+            color: var(--text-primary);
         }
 
         input[type="file"]:focus {
             outline: none;
-            box-shadow: 0 0 12px #ff4500;
+            box-shadow: 0 0 12px var(--accent-primary);
         }
 
         /* Style the browse button */
         input[type="file"]::-webkit-file-upload-button {
-            background-color: #ff4500;
+            background-color: var(--accent-primary);
             color: #000;
             border: none;
             border-radius: 6px;
@@ -320,7 +358,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         input[type="file"]::-webkit-file-upload-button:hover {
-            background-color: #e65c00;
+            background-color: var(--accent-hover);
         }
 
         .form-actions {
@@ -332,7 +370,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 15px 30px;
             border: none;
             border-radius: 5px;
-            background-color: #ff4500;
+            background-color: var(--accent-primary);
             color: #000;
             font-weight: bold;
             font-size: 1.1em;
@@ -341,7 +379,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn:hover {
-            background-color: #e65c00;
+            background-color: var(--accent-hover);
         }
 
         .message {
@@ -364,8 +402,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /* Footer styles for the copyright text */
         .simple-footer {
-            background-color: #0d0d0d;
-            color: #fff;
+            background-color: var(--footer-bg);
+            color: var(--text-primary);
             padding: 20px 0;
             text-align: center;
             font-family: 'Poppins', sans-serif;
@@ -373,6 +411,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: relative;
             width: 100%;
             margin-top: 50px;
+            border-top: 2px solid var(--border-color);
         }
 
         .simple-footer::before {
@@ -382,7 +421,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 0;
             width: 100%;
             height: 2px;
-            background-color: #FF4500;
+            background-color: var(--accent-primary);
+        }
+
+        /* === Theme Toggle Button === */
+        .theme-toggle-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .theme-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 12px 35px var(--shadow-color);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-toggle-btn .theme-icon {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-btn .sun-icon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0);
+        }
+
+        .theme-toggle-btn .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .sun-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .moon-icon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0);
+        }
+
+        /* Autofill and focus fix */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+            
+            .theme-toggle-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .theme-toggle-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 1rem;
+            }
+            
+            .nav-logo {
+                font-size: 24px;
+            }
+            
+            .nav-menu {
+                gap: 1rem;
+            }
+            
+            .nav-menu a {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -439,7 +583,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
+
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
+            <i class="fas fa-sun theme-icon sun-icon"></i>
+            <i class="fas fa-moon theme-icon moon-icon"></i>
+        </button>
+    </div>
+
     <div class="simple-footer"> &copy; <?= date('Y') ?> MealMate. All rights reserved. </div>
+
+    <script src="/MealMate-online-food-ordering-system/theme-toggle.js"></script>
 </body>
 
 </html>

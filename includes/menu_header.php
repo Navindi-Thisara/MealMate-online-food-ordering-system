@@ -68,9 +68,11 @@ $orders_active = (in_array($current_page, ['my_orders.php', 'order_details.php',
                     });
                 });
                 
-                // Close menu when clicking outside
+                // Close menu when clicking outside - FIXED to not interfere with theme toggle
                 document.addEventListener('click', function(event) {
-                    if (!navToggle.contains(event.target) && !navMenu.contains(event.target)) {
+                    const isThemeToggle = event.target.closest('.theme-toggle-btn') || event.target.closest('.theme-toggle-container');
+                    
+                    if (!isThemeToggle && !navToggle.contains(event.target) && !navMenu.contains(event.target)) {
                         navMenu.classList.remove('nav-menu-active');
                         navToggle.classList.remove('toggle-active');
                     }
@@ -78,3 +80,4 @@ $orders_active = (in_array($current_page, ['my_orders.php', 'order_details.php',
             }
         });
     </script>
+</document_content>

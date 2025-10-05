@@ -37,19 +37,52 @@ include '../includes/menu_header.php';
     <title><?php echo $page_title; ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Orders Page Styling - Matching MealMate Theme */
+        /* === CSS Variables for Theme === */
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222;
+            --bg-header: rgba(0, 0, 0, 0.8);
+            --text-primary: #fff;
+            --text-secondary: #ddd;
+            --text-muted: #ccc;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF6B35;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.3);
+            --footer-bg: rgba(0, 0, 0, 0.9);
+            --footer-border: #333;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f0f0f0;
+            --bg-card: #fff;
+            --bg-header: rgba(255, 255, 255, 0.98);
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #555;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF3300;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.25);
+            --footer-bg: #f8f8f8;
+            --footer-border: #ddd;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
-            background-color: #000;
-            color: #fff;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
             font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .main-container {
@@ -76,31 +109,31 @@ include '../includes/menu_header.php';
             font-size: 3.5rem;
             margin-bottom: 1rem;
             display: block;
-            color: #FF4500;
+            color: var(--accent-primary);
         }
 
         .page-header h1 {
             font-size: 2.8rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0;
             font-weight: 700;
         }
 
         .page-header p {
             font-size: 1.3rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-secondary);
             margin: 1rem 0;
             line-height: 1.5;
         }
 
         /* Filter Section */
         .filters-section {
-            background: linear-gradient(135deg, #111, #1a1a1a);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
             border-radius: 15px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 1.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
 
         .filter-controls {
@@ -117,15 +150,15 @@ include '../includes/menu_header.php';
         }
 
         .filter-group label {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 600;
             font-size: 1.1rem;
         }
 
         .filter-select {
-            background: #000;
-            border: 2px solid #FF4500;
-            color: #fff;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
             padding: 0.8rem 1.2rem;
             border-radius: 8px;
             font-size: 1rem;
@@ -135,13 +168,13 @@ include '../includes/menu_header.php';
 
         .filter-select:focus {
             outline: none;
-            border-color: #FF6B35;
+            border-color: var(--accent-hover);
             box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.2);
         }
 
         .filter-select option {
-            background: #000;
-            color: #fff;
+            background: var(--bg-primary);
+            color: var(--text-primary);
         }
 
         .orders-summary {
@@ -169,11 +202,11 @@ include '../includes/menu_header.php';
         }
 
         .order-card {
-            background: linear-gradient(135deg, #111, #1a1a1a);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
             border-radius: 15px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 6px 20px var(--shadow-color);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -181,7 +214,7 @@ include '../includes/menu_header.php';
 
         .order-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 69, 0, 0.25);
+            box-shadow: 0 8px 25px var(--shadow-color);
         }
 
         .order-card::before {
@@ -191,7 +224,7 @@ include '../includes/menu_header.php';
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #FF4500, #FF6B35);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-hover));
         }
 
         .order-header {
@@ -204,7 +237,7 @@ include '../includes/menu_header.php';
         }
 
         .order-info h3 {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 1.5rem;
             margin: 0 0 0.5rem;
             font-weight: 700;
@@ -220,12 +253,12 @@ include '../includes/menu_header.php';
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-secondary);
             font-size: 0.95rem;
         }
 
         .meta-item i {
-            color: #FF4500;
+            color: var(--accent-primary);
             width: 16px;
         }
 
@@ -340,7 +373,7 @@ include '../includes/menu_header.php';
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
             color: #000;
             box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
         }
@@ -387,8 +420,8 @@ include '../includes/menu_header.php';
 
         .pagination a, .pagination span {
             padding: 0.8rem 1.2rem;
-            background: linear-gradient(135deg, #111, #1a1a1a);
-            color: #fff;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            color: var(--text-primary);
             text-decoration: none;
             border-radius: 8px;
             border: 2px solid rgba(255, 69, 0, 0.3);
@@ -397,33 +430,33 @@ include '../includes/menu_header.php';
         }
 
         .pagination a:hover {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
             color: #000;
             transform: translateY(-2px);
         }
 
         .pagination .current {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
             color: #000;
-            border-color: #FF4500;
+            border-color: var(--accent-primary);
         }
 
         /* Empty State */
         .empty-orders {
             text-align: center;
             padding: 4rem 2rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-secondary);
         }
 
         .empty-orders .icon {
             font-size: 5rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin-bottom: 1.5rem;
             display: block;
         }
 
         .empty-orders h3 {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 2rem;
             margin-bottom: 1rem;
             font-weight: 600;
@@ -432,6 +465,101 @@ include '../includes/menu_header.php';
         .empty-orders p {
             font-size: 1.2rem;
             margin-bottom: 2rem;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .theme-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 12px 35px var(--shadow-color);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-toggle-btn .theme-icon {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-btn .sun-icon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0);
+        }
+
+        .theme-toggle-btn .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .sun-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .moon-icon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0);
+        }
+
+        /* Autofill and focus fix */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Focus and Accessibility Improvements */
+        .theme-toggle-btn:focus,
+        .btn:focus,
+        .filter-select:focus {
+            outline: 3px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            .theme-toggle-btn,
+            .btn,
+            .order-card,
+            .pagination a {
+                transition: none;
+            }
+            
+            .theme-toggle-btn:hover,
+            .btn:hover,
+            .order-card:hover,
+            .pagination a:hover {
+                transform: none;
+            }
         }
 
         /* Responsive Design */
@@ -498,6 +626,17 @@ include '../includes/menu_header.php';
                 padding: 0.6rem 0.8rem;
                 font-size: 0.9rem;
             }
+            
+            .theme-toggle-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .theme-toggle-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -526,7 +665,7 @@ include '../includes/menu_header.php';
     </style>
 </head>
 
-<body>
+<body class="orders-page">
     <div class="main-container">
         <div class="content">
             <div class="page-header">
@@ -696,6 +835,17 @@ include '../includes/menu_header.php';
         </div>
     </div>
 
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme" type="button">
+            <i class="fas fa-sun theme-icon sun-icon"></i>
+            <i class="fas fa-moon theme-icon moon-icon"></i>
+        </button>
+    </div>
+
+    <!-- Load theme toggle script -->
+    <script src="../theme-toggle.js"></script>
+    
     <script>
         function filterOrders() {
             const status = document.getElementById('statusFilter').value;

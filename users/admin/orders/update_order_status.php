@@ -18,8 +18,8 @@ function logError($message) {
 }
 
 try {
-    // Check if admin is logged in
-    if (!isset($_SESSION['admin_id']) && !isset($_SESSION['is_admin'])) {
+    // Check if admin is logged in - FIXED: Use consistent session check
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
         http_response_code(401);
         echo json_encode([
             'success' => false, 
@@ -193,7 +193,7 @@ try {
         }
         
         // Try to log the status change (optional - won't fail if table doesn't exist)
-        $admin_id = $_SESSION['admin_id'] ?? $_SESSION['user_id'] ?? 0;
+        $admin_id = $_SESSION['user_id'] ?? 0;
         
         // Check if order_status_log table exists
         $table_check = $conn->query("SHOW TABLES LIKE 'order_status_log'");
