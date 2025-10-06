@@ -30,7 +30,7 @@ if (isset($_SESSION['user_id'])) {
     <!-- Beautiful Confirmation Modal -->
     <div class="confirmation-modal" id="confirmationModal">
         <div class="confirmation-content">
-            <button class="close-confirm-btn" onclick="hideConfirmationModal()">&times;</button>
+            <button class="close-confirm-btn" onclick="hideConfirmationModal()" aria-label="Close">&times;</button>
             <div class="confirmation-icon">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
@@ -48,7 +48,7 @@ if (isset($_SESSION['user_id'])) {
     <div id="sliding-cart">
         <div class="cart-header">
             <h2>Your Cart</h2>
-            <button class="close-cart-btn" onclick="toggleCart()">
+            <button class="close-cart-btn" onclick="toggleCart()" aria-label="Close cart">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -66,9 +66,46 @@ if (isset($_SESSION['user_id'])) {
         <div class="header">
             <h2>🍕 Food Menu</h2>
             <p>Discover our delicious offerings</p>
-            <div class="cart-icon" id="main-cart-icon" onclick="toggleCart()">
+            
+            <!-- Search Control -->
+            <div class="menu-controls">
+                <div class="search-box">
+                    <input type="text" id="menuSearch" placeholder="Search for your favorite dish..." aria-label="Search menu">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            
+            <!-- Category Button Bar -->
+            <div class="category-buttons">
+                <button class="category-btn active" data-category="all">
+                    🍽️ All Menu
+                </button>
+                <button class="category-btn" data-category="burgers-and-sandwiches">
+                    🍔 Burgers & Sandwiches
+                </button>
+                <button class="category-btn" data-category="pizzas">
+                    🍕 Pizzas
+                </button>
+                <button class="category-btn" data-category="pastas">
+                    🍝 Pastas
+                </button>
+                <button class="category-btn" data-category="appetizers">
+                    🍟 Appetizers
+                </button>
+                <button class="category-btn" data-category="desserts">
+                    🍰 Desserts
+                </button>
+            </div>
+            
+            <div class="cart-icon" id="main-cart-icon" onclick="toggleCart()" aria-label="Open cart">
                 <i class="fas fa-shopping-cart"></i>
             </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div class="no-results" id="noResultsMessage">
+            <i class="fas fa-search"></i>
+            <p>No items found matching your search.</p>
         </div>
 
         <?php
@@ -89,8 +126,28 @@ if (isset($_SESSION['user_id'])) {
             if ($result_categories && $result_categories->num_rows > 0) {
                 while ($category_row = $result_categories->fetch_assoc()) {
                     $category_name = $category_row['category'];
+                    $category_id = strtolower(str_replace(' ', '-', $category_name));
+                    
+                    // Normalize category data attribute to match button values
+                    $category_data = strtolower(str_replace(' ', '-', $category_name));
+                    // Handle "Pasta" vs "Pastas" inconsistency
+                    if ($category_data === 'pasta') {
+                        $category_data = 'pastas';
+                    }
+                    
+                    // Category icon mapping
+                    $category_icons = [
+                        'Burgers and Sandwiches' => '🍔',
+                        'Pizzas' => '🍕',
+                        'Pastas' => '🍝',
+                        'Pasta' => '🍝',
+                        'Appetizers' => '🍟',
+                        'Desserts' => '🍰'
+                    ];
+                    $icon = $category_icons[$category_name] ?? '🍽️';
 
-                    echo '<h2 class="category-title">' . htmlspecialchars($category_name) . '</h2>';
+                    echo '<div class="category-section" id="' . htmlspecialchars($category_id) . '" data-category="' . htmlspecialchars($category_data) . '">';
+                    echo '<h2 class="category-title">' . $icon . ' ' . htmlspecialchars($category_name) . '</h2>';
                     echo '<div class="menu-grid">';
 
                     // Fetch food items for the current category
@@ -118,24 +175,34 @@ if (isset($_SESSION['user_id'])) {
                                 <div class="food-image">
                                     <img src="' . htmlspecialchars($image_path) . '" 
                                         alt="' . htmlspecialchars($food_row["name"]) . '"
+                                        loading="lazy"
                                         onerror="this.src=\'../assets/images/menu/default.jpg\';">
                                 </div>
                                 <h3>' . htmlspecialchars($food_row["name"]) . '</h3>
                                 <p>' . htmlspecialchars($food_row["description"]) . '</p>
                                 <div class="item-footer">
                                     <span class="price">Rs.' . htmlspecialchars($food_row["price"]) . '</span>
-                                    <button class="add-to-cart" onclick="addToCart(' . $food_row["id"] . ')">Add to Cart</button>
+                                    <button class="add-to-cart" onclick="addToCart(' . $food_row["id"] . ', this)" aria-label="Add ' . htmlspecialchars($food_row["name"]) . ' to cart">
+                                        Add to Cart
+                                    </button>
                                 </div>
                             </div>';
                         }
                     }
                     echo '</div>';
+                    echo '</div>';
                 }
             } else {
+                echo '<div class="no-results show">';
+                echo '<i class="fas fa-utensils"></i>';
                 echo '<p>No food items are currently available.</p>';
+                echo '</div>';
             }
         } else {
+            echo '<div class="no-results show">';
+            echo '<i class="fas fa-exclamation-circle"></i>';
             echo '<p>Error: Could not connect to the database.</p>';
+            echo '</div>';
         }
         ?>
     </div>
