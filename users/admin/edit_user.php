@@ -446,7 +446,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <input type="text" name="contact_no" placeholder="Contact Number" value="<?= htmlspecialchars($user['contact_no']) ?>" required>
             <input type="text" name="address" placeholder="Address" value="<?= htmlspecialchars($user['address']) ?>" required>
             <select name="role" required>
-                <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>User</option>
+                <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>Customer</option>
                 <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
             </select>
             <button type="submit">Update User</button>
