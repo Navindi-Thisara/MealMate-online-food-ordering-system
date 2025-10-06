@@ -62,9 +62,18 @@ include 'includes/header.php';
 <section id="reviews" class="section reviews">
     <h2>Customer Reviews</h2>
     <div class="review-list">
-        <div class="review-card">"Amazing food and quick delivery!" - Jane</div>
-        <div class="review-card">"Great experience, will order again!" - Mike</div>
-        <div class="review-card">"Highly recommended, excellent service!" - Sarah</div>
+        <div class="review-card">
+            <p>"Amazing food and quick delivery!"</p>
+            <span>- Jane</span>
+        </div>
+        <div class="review-card">
+            <p>"Great experience, will order again!"</p>
+            <span>- Mike</span>
+        </div>
+        <div class="review-card">
+            <p>"Highly recommended, excellent service!"</p>
+            <span>- Sarah</span>
+        </div>
     </div>
 </section>
 
@@ -77,6 +86,14 @@ include 'includes/header.php';
     <button type="submit" name="submit">Send Message</button>
 </form>
 </section>
+
+<!-- Theme Toggle Button -->
+<div class="theme-toggle-container">
+    <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
+        <i class="fas fa-sun theme-icon sun-icon"></i>
+        <i class="fas fa-moon theme-icon moon-icon"></i>
+    </button>
+</div>
     
 <?php 
 // Include footer file
@@ -84,5 +101,6 @@ include 'includes/footer.php';
 ?>
 
 <script src="index.js" defer></script>
+<script src="theme-toggle.js" defer></script>
 </body>
 </html>

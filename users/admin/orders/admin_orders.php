@@ -34,6 +34,39 @@ $page_title = "Orders Dashboard - MealMate Admin";
     <title><?php echo $page_title; ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* === CSS Variables for Theme === */
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222;
+            --bg-header: rgba(0, 0, 0, 0.8);
+            --text-primary: #fff;
+            --text-secondary: #ddd;
+            --text-muted: #ccc;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF6B35;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.3);
+            --footer-bg: rgba(0, 0, 0, 0.9);
+            --footer-border: #333;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f0f0f0;
+            --bg-card: #fff;
+            --bg-header: rgba(255, 255, 255, 0.98);
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #555;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF3300;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.25);
+            --footer-bg: #f8f8f8;
+            --footer-border: #ddd;
+        }
+
         /* === Global Styles === */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
@@ -45,18 +78,22 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         body {
             font-family: 'Poppins', sans-serif;
-            color: #fff;
+            color: var(--text-primary);
             scroll-behavior: smooth;
-            background-color: #0d0d0d;
+            background-color: var(--bg-primary);
             overflow-x: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* === Navbar Styles === */
         .navbar {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: var(--bg-header);
             backdrop-filter: blur(10px);
-            border-bottom: 2px solid #FF4500;
+            border-bottom: 2px solid var(--border-color);
             padding: 20px 50px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             z-index: 20;
@@ -79,11 +116,15 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .nav-logo {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 32px;
             font-weight: 700;
             margin: 0;
             text-shadow: 3px 3px 6px #000;
+        }
+
+        [data-theme="light"] .nav-logo {
+            text-shadow: 2px 2px 4px rgba(255, 69, 0, 0.2);
         }
 
         .nav-menu {
@@ -94,7 +135,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .nav-menu a {
-            color: #fff;
+            color: var(--text-primary);
             text-decoration: none;
             font-size: 18px;
             font-weight: 400;
@@ -111,13 +152,13 @@ $page_title = "Orders Dashboard - MealMate Admin";
             left: 0;
             width: 0;
             height: 2px;
-            background: #FF4500;
+            background: var(--accent-primary);
             transition: width 0.3s ease;
         }
 
         .nav-menu a:hover,
         .nav-menu a.active {
-            color: #FF4500;
+            color: var(--accent-primary);
         }
 
         .nav-menu a:hover::after,
@@ -131,6 +172,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
             max-width: 1400px;
             margin: 120px auto 2rem auto;
             padding: 0 50px;
+            flex: 1;
         }
 
         /* === Header Section === */
@@ -142,14 +184,14 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .dashboard-header h1 {
-            color: #ff4500;
+            color: var(--accent-primary);
             font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 0.5rem;
         }
 
         .dashboard-header p {
-            color: #cccccc;
+            color: var(--text-secondary);
             font-size: 1.2rem;
             margin-bottom: 1rem;
         }
@@ -162,7 +204,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
             right: 0;
             width: 100vw;
             height: 2px;
-            background-color: #ff4500;
+            background-color: var(--accent-primary);
             margin-left: calc(-50vw + 50%);
         }
 
@@ -175,17 +217,17 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .stat-card {
-            background: rgba(20,20,20,0.95);
+            background: var(--bg-card);
             border-radius: 12px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(255,69,0,0.5);
+            box-shadow: 0 4px 20px var(--shadow-color);
             text-align: center;
         }
 
         .stat-icon {
             font-size: 2.5rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin-bottom: 1rem;
         }
 
@@ -197,7 +239,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .stat-label {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(var(--text-primary), 0.8);
             font-size: 1rem;
             margin-bottom: 0.5rem;
         }
@@ -209,7 +251,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         /* Urgent Orders Alert */
         .urgent-alerts {
-            background: rgba(20,20,20,0.95);
+            background: var(--bg-card);
             border-radius: 12px;
             border: 2px solid #dc3545;
             padding: 1.5rem;
@@ -242,12 +284,12 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         /* Filters Section */
         .filters-section {
-            background: rgba(20,20,20,0.95);
+            background: var(--bg-card);
             border-radius: 12px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(255,69,0,0.5);
+            box-shadow: 0 4px 20px var(--shadow-color);
         }
 
         .filters-grid {
@@ -264,16 +306,16 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .filter-group label {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 600;
             font-size: 1rem;
         }
 
         .filter-input,
         .filter-select {
-            background: #000;
-            border: 2px solid #FF4500;
-            color: #fff;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            color: var(--text-primary);
             padding: 0.8rem;
             border-radius: 8px;
             font-size: 1rem;
@@ -283,8 +325,8 @@ $page_title = "Orders Dashboard - MealMate Admin";
         .filter-input:focus,
         .filter-select:focus {
             outline: none;
-            border-color: #FF6B35;
-            box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.2);
+            border-color: var(--accent-hover);
+            box-shadow: 0 0 0 3px rgba(var(--accent-primary), 0.2);
         }
 
         .filter-buttons {
@@ -308,15 +350,15 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .btn-primary {
-            background: #ff4500;
+            background: var(--accent-primary);
             color: #000;
-            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
+            box-shadow: 0 4px 12px rgba(var(--accent-primary), 0.35);
         }
 
         .btn-primary:hover {
-            background: #e65c00;
+            background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(255, 69, 0, 0.5);
+            box-shadow: 0 6px 18px rgba(var(--accent-primary), 0.5);
         }
 
         .btn-secondary {
@@ -349,11 +391,11 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         /* Orders Table */
         .orders-table-container {
-            background: rgba(20,20,20,0.95);
+            background: var(--bg-card);
             border-radius: 12px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 2rem;
-            box-shadow: 0 4px 20px rgba(255,69,0,0.5);
+            box-shadow: 0 4px 20px var(--shadow-color);
             overflow-x: auto;
             margin-bottom: 2rem;
         }
@@ -362,18 +404,18 @@ $page_title = "Orders Dashboard - MealMate Admin";
             width: 100%;
             border-collapse: collapse;
             min-width: 800px;
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .orders-table th,
         .orders-table td {
             padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 69, 0, 0.2);
+            border-bottom: 1px solid rgba(var(--accent-primary), 0.2);
         }
 
         .orders-table th {
-            background-color: #ff4500;
+            background-color: var(--accent-primary);
             color: #000;
             font-weight: bold;
             text-transform: uppercase;
@@ -388,12 +430,12 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .orders-table tbody tr:hover {
-            background: rgba(255, 69, 0, 0.05);
+            background: rgba(var(--accent-primary), 0.05);
             transform: translateX(5px);
         }
 
         .order-number {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-weight: 600;
             text-decoration: none;
         }
@@ -415,7 +457,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         .customer-email {
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(var(--text-primary), 0.6);
         }
 
         .order-status-badge {
@@ -516,14 +558,14 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .modal-content {
-            background: #222;
+            background: var(--bg-card);
             margin: 10% auto;
             padding: 2rem;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--accent-primary);
             border-radius: 15px;
             width: 90%;
             max-width: 500px;
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .modal-header {
@@ -534,14 +576,14 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .modal-title {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 1.5rem;
             font-weight: 700;
             margin: 0;
         }
 
         .close {
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 2rem;
             font-weight: bold;
             cursor: pointer;
@@ -549,7 +591,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
         }
 
         .close:hover {
-            color: #FF6B35;
+            color: var(--accent-hover);
         }
 
         /* Pagination */
@@ -564,38 +606,39 @@ $page_title = "Orders Dashboard - MealMate Admin";
 
         .pagination a, .pagination span {
             padding: 0.8rem 1.2rem;
-            background: rgba(20,20,20,0.95);
-            color: #fff;
+            background: var(--bg-card);
+            color: var(--text-primary);
             text-decoration: none;
             border-radius: 8px;
-            border: 2px solid rgba(255, 69, 0, 0.3);
+            border: 2px solid rgba(var(--accent-primary), 0.3);
             transition: all 0.3s ease;
             font-weight: 600;
         }
 
         .pagination a:hover {
-            background: #ff4500;
+            background: var(--accent-primary);
             color: #000;
             transform: translateY(-2px);
         }
 
         .pagination .current {
-            background: #ff4500;
+            background: var(--accent-primary);
             color: #000;
-            border-color: #FF4500;
+            border-color: var(--accent-primary);
         }
 
         /* === Footer Styles === */
         .simple-footer {
-            background-color: #0d0d0d;
-            color: #fff;
+            background-color: var(--footer-bg);
+            color: var(--text-primary);
             padding: 20px 0;
             text-align: center;
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
             position: relative;
             width: 100%;
-            margin-top: 3rem;
+            margin-top: auto;
+            border-top: 2px solid var(--border-color);
         }
 
         .simple-footer::before {
@@ -605,7 +648,77 @@ $page_title = "Orders Dashboard - MealMate Admin";
             left: 0;
             width: 100%;
             height: 2px;
-            background-color: #FF4500;
+            background-color: var(--accent-primary);
+        }
+
+        /* === Theme Toggle Button === */
+        .theme-toggle-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .theme-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 12px 35px var(--shadow-color);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-toggle-btn .theme-icon {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-btn .sun-icon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0);
+        }
+
+        .theme-toggle-btn .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .sun-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .moon-icon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0);
+        }
+
+        /* Autofill and focus fix */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            box-shadow: 0 0 0px 1000px var(--bg-secondary) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
 
         /* Responsive Design */
@@ -685,6 +798,17 @@ $page_title = "Orders Dashboard - MealMate Admin";
             .modal-content {
                 margin: 5% auto;
                 padding: 1.5rem;
+            }
+
+            .theme-toggle-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .theme-toggle-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
         }
 
@@ -852,7 +976,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
                 <tbody>
                     <?php if (empty($orders)): ?>
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.6);">
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: rgba(var(--text-primary), 0.6);">
                             <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
                             No orders found matching the selected criteria.
                         </td>
@@ -889,7 +1013,7 @@ $page_title = "Orders Dashboard - MealMate Admin";
                             </td>
                             <td>
                                 <div><?php echo date('M d, Y', strtotime($order['created_at'])); ?></div>
-                                <small style="color: rgba(255, 255, 255, 0.6);">
+                                <small style="color: rgba(var(--text-primary), 0.6);">
                                     <?php echo date('g:i A', strtotime($order['created_at'])); ?>
                                 </small>
                             </td>
@@ -984,10 +1108,19 @@ $page_title = "Orders Dashboard - MealMate Admin";
         </div>
     </div>
 
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
+            <i class="fas fa-sun theme-icon sun-icon"></i>
+            <i class="fas fa-moon theme-icon moon-icon"></i>
+        </button>
+    </div>
+
     <div class="simple-footer">
         &copy; <?= date('Y') ?> MealMate. All rights reserved.
     </div>
 
+    <script src="/MealMate-online-food-ordering-system/theme-toggle.js"></script>
     <script>
         function updateOrderStatus(orderId, currentStatus) {
             document.getElementById('orderId').value = orderId;

@@ -133,21 +133,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d0d0d">
     <title>Checkout - MealMate</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* === CSS Variables for Theme === */
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222;
+            --bg-header: rgba(0, 0, 0, 0.8);
+            --text-primary: #fff;
+            --text-secondary: #ddd;
+            --text-muted: #ccc;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF6B35;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.3);
+            --footer-bg: rgba(0, 0, 0, 0.9);
+            --footer-border: #333;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f0f0f0;
+            --bg-card: #fff;
+            --bg-header: rgba(255, 255, 255, 0.98);
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #555;
+            --accent-primary: #FF4500;
+            --accent-hover: #FF3300;
+            --border-color: #FF4500;
+            --shadow-color: rgba(255, 69, 0, 0.25);
+            --footer-bg: #f8f8f8;
+            --footer-border: #ddd;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
-            background-color: #000;
-            color: #fff;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
             font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .main-container {
@@ -175,19 +210,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 3.5rem;
             margin-bottom: 1rem;
             display: block;
-            color: #FF4500;
+            color: var(--accent-primary);
         }
 
         .page-header h1 {
             font-size: 2.8rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0;
             font-weight: 700;
         }
 
         .page-header p {
             font-size: 1.3rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-secondary);
             margin: 1rem 0;
             line-height: 1.5;
         }
@@ -213,6 +248,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 2px solid #dc3545;
         }
 
+        [data-theme="light"] .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        [data-theme="light"] .alert-danger {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
         .checkout-container {
             display: flex;
             flex-direction: row;
@@ -223,17 +268,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .order-summary-section, .order-details-section {
             flex: 1;
-            background: linear-gradient(135deg, #111, #1a1a1a);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
             border-radius: 15px;
-            border: 2px solid #FF4500;
+            border: 2px solid var(--border-color);
             padding: 2rem;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
 
         .section-title {
             font-size: 1.8rem;
-            color: #FF4500;
-            border-bottom: 3px solid #FF4500;
+            color: var(--accent-primary);
+            border-bottom: 3px solid var(--border-color);
             padding-bottom: 1rem;
             margin-bottom: 1.5rem;
             text-align: center;
@@ -267,7 +312,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 70px;
             border-radius: 10px;
             overflow: hidden;
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -282,7 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .item-details h4 {
             font-size: 1.3rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin: 0 0 0.3rem;
             font-weight: 600;
         }
@@ -295,7 +340,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .item-quantity {
             font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-secondary);
             background: rgba(255, 69, 0, 0.1);
             padding: 0.3rem 0.8rem;
             border-radius: 20px;
@@ -317,14 +362,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .total-row span {
             font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--text-secondary);
         }
 
         .total-row.grand-total {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #FF4500;
-            border-top: 2px dashed #FF4500;
+            color: var(--accent-primary);
+            border-top: 2px dashed var(--border-color);
             padding-top: 1rem;
             margin-top: 1rem;
         }
@@ -336,7 +381,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-group label {
             display: block;
             font-size: 1.1rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin-bottom: 0.5rem;
             font-weight: 600;
         }
@@ -344,16 +389,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-group input, .form-group textarea {
             width: 100%;
             padding: 1rem;
-            background: #000;
-            border: 2px solid #FF4500;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
             border-radius: 8px;
-            color: #fff;
+            color: var(--text-primary);
             font-size: 1rem;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
         }
 
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
-            border-color: #FF6B35;
+            border-color: var(--accent-hover);
             box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.2);
         }
 
@@ -369,7 +419,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .required::after {
             content: " *";
-            color: #FF4500;
+            color: var(--accent-primary);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 0.3rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
         /* Payment Method Styles */
@@ -401,14 +458,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transition: all 0.3s ease;
         }
 
+        .payment-label:hover {
+            background: rgba(255, 69, 0, 0.1);
+        }
+
         .payment-option input[type="radio"]:checked + .payment-label {
             background: rgba(255, 69, 0, 0.15);
-            border-color: #FF4500;
+            border-color: var(--accent-primary);
         }
 
         .payment-icon {
             font-size: 2rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             width: 50px;
             text-align: center;
         }
@@ -419,13 +480,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .payment-info h4 {
             margin: 0 0 0.3rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             font-size: 1.2rem;
         }
 
         .payment-info p {
             margin: 0;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-secondary);
             font-size: 0.95rem;
         }
 
@@ -451,7 +512,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #FF4500, #FF6B35);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
             color: #000;
             box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
         }
@@ -467,9 +528,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 2px solid #666;
         }
 
+        [data-theme="light"] .btn-secondary {
+            background: linear-gradient(135deg, #e0e0e0, #d0d0d0);
+            color: var(--text-primary);
+            border: 2px solid #ccc;
+        }
+
         .btn-secondary:hover {
             background: linear-gradient(135deg, #555, #777);
             transform: translateY(-2px);
+        }
+
+        [data-theme="light"] .btn-secondary:hover {
+            background: linear-gradient(135deg, #d0d0d0, #c0c0c0);
         }
 
         .order-success-details {
@@ -481,7 +552,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .order-success-details h3 {
-            color: #FF4500;
+            color: var(--accent-primary);
             margin-top: 0;
             font-size: 1.5rem;
         }
@@ -491,7 +562,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             justify-content: space-between;
             margin-bottom: 0.8rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            border-bottom: 1px dashed rgba(255, 69, 0, 0.2);
         }
 
         .cod-notice {
@@ -518,21 +589,91 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .cod-notice-text p {
             margin: 0;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--text-secondary);
         }
 
         .empty-cart-message {
             text-align: center;
             padding: 3rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-secondary);
             font-size: 1.3rem;
         }
 
         .empty-cart-message .icon {
             font-size: 4rem;
-            color: #FF4500;
+            color: var(--accent-primary);
             margin-bottom: 1rem;
             display: block;
+        }
+
+        /* Autofill and focus fix */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-primary) inset !important;
+            box-shadow: 0 0 0px 1000px var(--bg-primary) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .theme-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 12px 35px var(--shadow-color);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-toggle-btn .theme-icon {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-btn .sun-icon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0);
+        }
+
+        .theme-toggle-btn .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .sun-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .moon-icon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0);
         }
 
         @media (max-width: 992px) {
@@ -552,6 +693,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             .order-summary-section, .order-details-section {
                 padding: 1.5rem;
+            }
+            
+            .theme-toggle-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .theme-toggle-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
         }
     </style>
@@ -626,7 +778,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="order-details-section">
                         <?php if (isset($_SESSION['order_details'])): ?>
                             <h2 class="section-title">Order Confirmed!</h2>
-                            <p style="text-align: center; color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">Thank you for your order. Here are your order details:</p>
+                            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1.5rem;">Thank you for your order. Here are your order details:</p>
                             
                             <div class="order-success-details">
                                 <h3>Order #<?php echo htmlspecialchars($_SESSION['order_details']['order_number']); ?></h3>
@@ -690,14 +842,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <label for="postal_code" class="required">Postal Code</label>
                                     <input type="text" id="postal_code" name="postal_code" placeholder="5-digit postal code (e.g., 10100)" required maxlength="5"
                                            value="<?php echo isset($_POST['postal_code']) ? htmlspecialchars($_POST['postal_code']) : ''; ?>">
-                                    <small style="color: rgba(255, 255, 255, 0.6);">Numbers only, 5 digits</small>
+                                    <small>Numbers only, 5 digits</small>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="phone" class="required">Phone Number</label>
                                     <input type="tel" id="phone" name="phone" placeholder="10-digit number (e.g., 0771234567)" required maxlength="10"
                                            value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
-                                    <small style="color: rgba(255, 255, 255, 0.6);">Format: 07XXXXXXXX</small>
+                                    <small>Format: 07XXXXXXXX</small>
                                 </div>
                                 
                                 <div class="form-group">
@@ -752,6 +904,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle-btn" aria-label="Toggle theme" title="Switch theme">
+            <i class="fas fa-sun theme-icon sun-icon"></i>
+            <i class="fas fa-moon theme-icon moon-icon"></i>
+        </button>
+    </div>
+
+    <script src="../theme-toggle.js"></script>
     <script>
         // Form validation
         document.getElementById('checkoutForm')?.addEventListener('submit', function(e) {
