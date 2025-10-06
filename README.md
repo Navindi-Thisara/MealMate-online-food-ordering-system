@@ -65,19 +65,29 @@ MealMate-online-food-ordering-system/
 ## Installation
 
 1. **Clone the repository**
-```bash
+
 git clone https://github.com/Navindi-Thisara/MealMate-online-food-ordering-system.git
 
-Setup Database
+2. **Setup Database**
 
 Import db.sql into your MySQL database.
 
 Update database credentials in includes/db_connect.php.
 
-Run the project
+3. **Run the project**
 
 Use XAMPP or any local server.
 
 Place the project in the htdocs folder.
 
 Open http://localhost/MealMate-online-food-ordering-system/index.php in your browser.
+
+## Usage
+
+- Admin login credentials can be set in the users table.
+
+- Customers can register via register.php.
+
+- Admins can manage menus, orders, and users via the dashboard.
+
+- Dark mode toggle available via theme-toggle.js.
