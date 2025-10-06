@@ -45,21 +45,20 @@ MealMate is a web-based online food ordering system designed to help restaurants
 ## Project Structure
 
 MealMate-online-food-ordering-system/
-├── assets/ # Images, icons, CSS, and JS files
-├── cart/ # Cart management pages
-├── food_management/ # Menu management pages
-├── includes/ # Database connection and common includes
-├── orders/ # Orders management pages
-├── users/ # User management pages
-├── vendor/ # Composer dependencies
-├── index.php # Landing page
-├── contact.php # Contact page
-├── index.css # Global CSS
-├── index.js # Global JS
-├── theme-toggle.js # Dark/light mode toggle
-├── db.sql # Database schema
-└── README.md # Project documentation
-
+├── assets/
+├── cart/
+├── food_management/
+├── includes/
+├── orders/
+├── users/
+├── vendor/
+├── index.php
+├── contact.php
+├── index.css
+├── index.js
+├── theme-toggle.js
+├── db.sql
+└── README.md
 
 ---
 
