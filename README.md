@@ -46,7 +46,9 @@ MealMate is a web-based online food ordering system designed to help restaurants
 
 MealMate-online-food-ordering-system/
 ├── assets/
+
 ├── cart/
+
 ├── food_management/
 ├── includes/
 ├── orders/
