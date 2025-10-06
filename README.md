@@ -68,3 +68,16 @@ MealMate-online-food-ordering-system/
 ```bash
 git clone https://github.com/Navindi-Thisara/MealMate-online-food-ordering-system.git
 
+Setup Database
+
+Import db.sql into your MySQL database.
+
+Update database credentials in includes/db_connect.php.
+
+Run the project
+
+Use XAMPP or any local server.
+
+Place the project in the htdocs folder.
+
+Open http://localhost/MealMate-online-food-ordering-system/index.php in your browser.
