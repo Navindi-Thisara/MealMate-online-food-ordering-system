@@ -216,9 +216,7 @@ if (isset($_SESSION['user_id'])) {
     </div>
 
     <!-- Footer -->
-    <div class="simple-footer">
-        &copy; <?php echo date('Y'); ?> MealMate. All rights reserved.
-    </div>
+<?php include '../includes/simple_footer.php'; ?>
 
     <!-- JavaScript -->
     <script src="menu.js"></script>
