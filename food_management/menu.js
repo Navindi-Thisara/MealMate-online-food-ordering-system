@@ -1,12 +1,8 @@
 // Global variable to store the cart ID for removal confirmation
 let pendingCartId = null;
 
-<<<<<<< HEAD
 // ===== ALERT FUNCTION =====
 // Shows a temporary notification message (success or error)
-=======
-// Enhanced alert with icon
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
 function showAlert(message, isError = false) {
     // Create a new div element for the alert
     const alertBox = document.createElement('div');
@@ -23,13 +19,8 @@ function showAlert(message, isError = false) {
 
     // Auto-remove the alert after 3 seconds
     setTimeout(() => {
-<<<<<<< HEAD
         alertBox.style.opacity = '0'; // Fade out
         setTimeout(() => alertBox.remove(), 500); // Remove from DOM
-=======
-        alertBox.style.opacity = '0';
-        setTimeout(() => alertBox.remove(), 500);
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
     }, 3000);
 }
 
@@ -39,23 +30,16 @@ function showConfirmationModal(cartId, itemName) {
     const modal = document.getElementById('confirmationModal');
     const message = document.getElementById('confirmationMessage');
     
-<<<<<<< HEAD
     // Set the confirmation message with item name
-=======
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
     if (itemName) {
         message.textContent = `Are you sure you want to remove "${itemName}" from your cart?`;
     } else {
         message.textContent = 'Are you sure you want to remove this item from your cart?';
     }
     
-<<<<<<< HEAD
     // Store the cart ID for later use
     pendingCartId = cartId;
     // Show the modal
-=======
-    pendingCartId = cartId;
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
     modal.classList.add('active');
 }
 
@@ -66,64 +50,41 @@ function hideConfirmationModal() {
     pendingCartId = null; // Clear the pending cart ID
 }
 
-<<<<<<< HEAD
 // ===== CART BADGE UPDATE =====
 // Updates the cart item count badge on the cart icon
-=======
-// Update cart badge count
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
 function updateCartBadge(count) {
     let badge = document.querySelector('.cart-badge');
     const cartIcon = document.getElementById('main-cart-icon');
     
     if (count > 0) {
-<<<<<<< HEAD
         // Create badge container if it doesn't exist
         if (!badge) {
             let container = document.querySelector('.cart-badge-container');
             if (!container && cartIcon) {
                 // Create container to hold cart icon and badge
-=======
-        if (!badge) {
-            // Check if cart-badge-container already exists
-            let container = document.querySelector('.cart-badge-container');
-            if (!container && cartIcon) {
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
                 container = document.createElement('div');
                 container.className = 'cart-badge-container';
                 cartIcon.parentNode.insertBefore(container, cartIcon);
                 container.appendChild(cartIcon);
             }
             
-<<<<<<< HEAD
             // Create the badge element
-=======
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
             badge = document.createElement('span');
             badge.className = 'cart-badge';
             if (container) {
                 container.appendChild(badge);
             }
         }
-<<<<<<< HEAD
         // Update badge count
         badge.textContent = count;
     } else if (badge) {
         // Remove badge if cart is empty
-=======
-        badge.textContent = count;
-    } else if (badge) {
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
         badge.remove();
     }
 }
 
-<<<<<<< HEAD
 // ===== UPDATE SLIDING CART =====
 // Fetches and displays cart items in the sliding cart panel
-=======
-// Update sliding cart with enhanced visuals
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
 function updateSlidingCart() {
     // Make API call to get cart items
     fetch('../cart/cart_items_api.php')
@@ -142,16 +103,10 @@ function updateSlidingCart() {
             const cartTotal = document.getElementById('cart-total-price');
             cartContainer.innerHTML = ''; // Clear existing items
 
-<<<<<<< HEAD
             // Update cart badge with item count
             updateCartBadge(data.items.length);
 
             // Check if cart is empty
-=======
-            // Update cart badge
-            updateCartBadge(data.items.length);
-
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
             if (data.items.length === 0) {
                 cartContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
                 cartTotal.textContent = 'Rs.0.00';
@@ -193,12 +148,8 @@ function updateSlidingCart() {
         });
 }
 
-<<<<<<< HEAD
 // ===== UPDATE CART QUANTITY =====
 // Increases or decreases the quantity of an item in cart
-=======
-// Update cart quantity
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
 function updateCartQuantity(cartId, change) {
     // Send request to update quantity API
     fetch('../cart/update_cart_api.php', {
@@ -225,12 +176,8 @@ function updateCartQuantity(cartId, change) {
     });
 }
 
-<<<<<<< HEAD
 // ===== REMOVE ITEM FROM CART =====
 // Completely removes an item from the cart
-=======
-// Remove item from cart
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
 function removeCartItem(cartId) {
     // Send request to remove item API
     fetch('../cart/remove_from_cart_api.php', {
@@ -255,7 +202,6 @@ function removeCartItem(cartId) {
     });
 }
 
-<<<<<<< HEAD
 // ===== ADD TO CART FUNCTION =====
 // Adds a food item to the user's cart with visual feedback
 function addToCart(foodId, buttonElement) {
@@ -266,16 +212,6 @@ function addToCart(foodId, buttonElement) {
         buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
         
         // Send request to add item to cart
-=======
-// Add to cart with visual feedback
-function addToCart(foodId, buttonElement) {
-    // Visual feedback on button
-    if (buttonElement) {
-        buttonElement.disabled = true;
-        const originalText = buttonElement.innerHTML;
-        buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-        
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
         fetch('../cart/add_to_cart_api.php', {
             method: 'POST',
             headers: {
@@ -287,7 +223,6 @@ function addToCart(foodId, buttonElement) {
         .then(data => {
             if (data.success) {
                 showAlert('Added to cart successfully!');
-<<<<<<< HEAD
                 updateSlidingCart(); // Refresh cart
                 
                 // Show success state on button
@@ -302,20 +237,6 @@ function addToCart(foodId, buttonElement) {
                     showAlert('Please log in to add items to cart.', true);
                     setTimeout(() => {
                         window.location.href = '../users/login.php'; // Redirect to login
-=======
-                updateSlidingCart();
-                
-                buttonElement.innerHTML = '<i class="fas fa-check"></i> Added!';
-                setTimeout(() => {
-                    buttonElement.disabled = false;
-                    buttonElement.innerHTML = originalText;
-                }, 1500);
-            } else {
-                if (data.message.includes('login') || data.message.includes('logged')) {
-                    showAlert('Please log in to add items to cart.', true);
-                    setTimeout(() => {
-                        window.location.href = '../users/login.php';
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
                     }, 2000);
                 } else {
                     showAlert('Error: ' + data.message, true);
@@ -335,12 +256,8 @@ function addToCart(foodId, buttonElement) {
     }
 }
 
-<<<<<<< HEAD
 // ===== TOGGLE CART PANEL =====
 // Opens and closes the sliding cart panel
-=======
-// Toggle cart
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
 function toggleCart() {
     const cart = document.getElementById('sliding-cart');
     const overlay = document.querySelector('.sliding-cart-overlay');
@@ -351,7 +268,6 @@ function toggleCart() {
     overlay.style.display = cart.classList.contains('open') ? 'block' : 'none';
     
     if (cart.classList.contains('open')) {
-<<<<<<< HEAD
         cartIcon.classList.add('hidden'); // Hide floating cart icon
         updateSlidingCart(); // Load cart items
         document.body.style.overflow = 'hidden'; // Prevent body scroll
@@ -549,179 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const foodId = originalOnclick.match(/\d+/)[0];
             button.removeAttribute('onclick');
             // Add new event listener that passes button element
-=======
-        cartIcon.classList.add('hidden');
-        updateSlidingCart();
-        document.body.style.overflow = 'hidden';
-    } else {
-        cartIcon.classList.remove('hidden');
-        document.body.style.overflow = '';
-    }
-}
-
-// Search and filter functionality
-function initializeSearch() {
-    const searchInput = document.getElementById('menuSearch');
-    const categoryButtons = document.querySelectorAll('.category-btn');
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', filterMenu);
-    }
-    
-    if (categoryButtons.length > 0) {
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Remove active class from all buttons
-                categoryButtons.forEach(btn => btn.classList.remove('active'));
-                // Add active class to clicked button
-                this.classList.add('active');
-                // Filter menu
-                filterMenu();
-            });
-        });
-    }
-}
-
-// Filter menu items
-function filterMenu() {
-    const searchInput = document.getElementById('menuSearch');
-    const activeButton = document.querySelector('.category-btn.active');
-    const noResultsDiv = document.getElementById('noResultsMessage');
-    
-    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    const selectedCategory = activeButton ? activeButton.getAttribute('data-category') : 'all';
-    
-    let visibleCount = 0;
-    const categorySections = document.querySelectorAll('.category-section');
-    
-    categorySections.forEach(section => {
-        const sectionCategory = section.getAttribute('data-category');
-        const menuItems = section.querySelectorAll('.menu-item');
-        let visibleInCategory = 0;
-        
-        menuItems.forEach(item => {
-            const itemName = item.querySelector('h3').textContent.toLowerCase();
-            const itemDesc = item.querySelector('p').textContent.toLowerCase();
-            
-            const matchesSearch = searchTerm === '' || itemName.includes(searchTerm) || itemDesc.includes(searchTerm);
-            const matchesCategory = selectedCategory === 'all' || sectionCategory === selectedCategory;
-            
-            if (matchesSearch && matchesCategory) {
-                item.style.display = 'flex';
-                visibleInCategory++;
-                visibleCount++;
-            } else {
-                item.style.display = 'none';
-            }
-        });
-        
-        // Hide category if no items visible
-        section.style.display = visibleInCategory > 0 ? 'block' : 'none';
-    });
-    
-    // Show/hide no results message
-    if (noResultsDiv) {
-        if (visibleCount === 0) {
-            noResultsDiv.classList.add('show');
-        } else {
-            noResultsDiv.classList.remove('show');
-        }
-    }
-}
-
-// Back to top button
-function initializeBackToTop() {
-    let backToTopBtn = document.querySelector('.back-to-top');
-    
-    if (!backToTopBtn) {
-        backToTopBtn = document.createElement('button');
-        backToTopBtn.className = 'back-to-top';
-        backToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-        backToTopBtn.setAttribute('aria-label', 'Back to top');
-        document.body.appendChild(backToTopBtn);
-    }
-    
-    // Show/hide on scroll
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            backToTopBtn.classList.add('show');
-        } else {
-            backToTopBtn.classList.remove('show');
-        }
-    });
-    
-    // Scroll to top on click
-    backToTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-}
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Update cart on page load
-    updateSlidingCart();
-    
-    // Initialize search and filter
-    initializeSearch();
-    
-    // Initialize back to top button
-    initializeBackToTop();
-    
-    // Add event listeners for confirmation modal
-    const confirmBtn = document.getElementById('confirmRemove');
-    const cancelBtn = document.getElementById('cancelRemove');
-    const modal = document.getElementById('confirmationModal');
-    const closeBtn = document.querySelector('.close-confirm-btn');
-    
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', () => {
-            if (pendingCartId) {
-                removeCartItem(pendingCartId);
-                hideConfirmationModal();
-            }
-        });
-    }
-    
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', hideConfirmationModal);
-    }
-    
-    if (closeBtn) {
-        closeBtn.addEventListener('click', hideConfirmationModal);
-    }
-    
-    // Close modal when clicking outside
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target.id === 'confirmationModal') {
-                hideConfirmationModal();
-            }
-        });
-    }
-    
-    // Close cart with Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const cart = document.getElementById('sliding-cart');
-            if (cart && cart.classList.contains('open')) {
-                toggleCart();
-            }
-            if (modal && modal.classList.contains('active')) {
-                hideConfirmationModal();
-            }
-        }
-    });
-    
-    // Update all "Add to Cart" buttons to pass button element
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        const originalOnclick = button.getAttribute('onclick');
-        if (originalOnclick) {
-            const foodId = originalOnclick.match(/\d+/)[0];
-            button.removeAttribute('onclick');
->>>>>>> 1dba0b4c0851e70b98371c9a2fa6353dd19964c1
             button.addEventListener('click', function() {
                 addToCart(foodId, this);
             });
